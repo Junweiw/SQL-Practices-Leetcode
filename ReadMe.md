@@ -618,7 +618,7 @@ GROUP BY sell_date
 [Q1484]:
 https://leetcode.com/problems/group-sold-products-by-the-date/
 
-[**Q1495 Friendly Movies Streamed Last Month**][Q1485]
+[**Q1495 Friendly Movies Streamed Last Month**][Q1495]
 ```sql
 SELECT DISTINCT title AS TITLE
 FROM TVProgram
