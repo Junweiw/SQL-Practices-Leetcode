@@ -1,5 +1,5 @@
 # SQL Practices
-This file includes my solutions to LeetCode SQL questions using MySQL.
+This file includes my solutions to LeetCode SQL questions using MySQL. [create an anchor](#q176-second-highest-salary)
 
 [**Q175 Combine Two Tables**][Q175]
 ```sql
@@ -11,13 +11,13 @@ ON Person.PersonId = Address.PersonId
 [Q175]:
 https://leetcode.com/problems/combine-two-tables/
 
-[**Q176 Second Highest Salary**][Q176]
+#### [Q176 Second Highest Salary]
 ```sql
 SELECT MAX(Salary) AS SecondHighestSalary
 FROM Employee
 WHERE Salary < (SELECT MAX(Salary) FROM Employee)
 ```
-[Q176]:
+[Q176 Second Highest Salary]:
 https://leetcode.com/problems/second-highest-salary/
 
 [**Q181 Employees Earning More Than Their Managers**][Q181]
