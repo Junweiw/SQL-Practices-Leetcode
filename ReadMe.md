@@ -1,7 +1,10 @@
 # SQL Practices
-This file includes my solutions to LeetCode SQL questions using MySQL. [create an anchor](#q176-second-highest-salary)
+This file includes my solutions to LeetCode SQL questions using MySQL.
 
-[**Q175 Combine Two Tables**][Q175]
+## Easy
+[Q175](#q175-combine-two-tables) | [Q176](#q176-second-highest-salary) | [Q181](#q181-employees-earning-more-than-their-managers)
+
+#### [Q175 Combine Two Tables][Q175]
 ```sql
 SELECT FirstName, LastName, City, State
 FROM Person
@@ -11,16 +14,16 @@ ON Person.PersonId = Address.PersonId
 [Q175]:
 https://leetcode.com/problems/combine-two-tables/
 
-#### [Q176 Second Highest Salary]
+#### [Q176 Second Highest Salary][Q176]
 ```sql
 SELECT MAX(Salary) AS SecondHighestSalary
 FROM Employee
 WHERE Salary < (SELECT MAX(Salary) FROM Employee)
 ```
-[Q176 Second Highest Salary]:
+[Q176]:
 https://leetcode.com/problems/second-highest-salary/
 
-[**Q181 Employees Earning More Than Their Managers**][Q181]
+#### [**Q181 Employees Earning More Than Their Managers**][Q181]
 ```sql
 SELECT Name AS Employee   
 FROM
