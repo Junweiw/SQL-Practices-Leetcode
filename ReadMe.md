@@ -478,5 +478,154 @@ GROUP BY product_id
 [Q1251]:
 https://leetcode.com/problems/average-selling-price/
 
+[**Q1280 Students and Examinations**][Q1280]
+```sql
+SELECT T1.student_id, T1.student_name, T1.subject_name, COALESCE(T2.exam_counts,0) AS attended_exams
+FROM
+(SELECT *
+ FROM Students, Subjects) T1
+LEFT JOIN
+(SELECT student_id, subject_name, COUNT(*) AS exam_counts
+ FROM Examinations
+ GROUP BY student_id, subject_name) T2
+ON T1.Student_id = T2.Student_id AND T1.subject_name = T2.subject_name
+ORDER BY T1.student_id, T1.subject_name, COALESCE(T2.exam_counts,0) DESC
+```
+[Q1280]:
+https://leetcode.com/problems/students-and-examinations/
 
+[**Q1294 Weather Type in Each Country**][Q1294]
+```sql
+SELECT Countries.country_name,
+    CASE WHEN AVG(Weather.weather_state) <= 15 THEN "Cold"
+         WHEN AVG(Weather.weather_state) >= 25 THEN "Hot"
+         ELSE "Warm" 
+    END AS weather_type
+FROM Weather
+LEFT JOIN Countries
+ON Weather.country_id = Countries.country_id
+WHERE Weather.day BETWEEN DATE("2019-11-01") AND DATE("2019-11-30")
+GROUP BY Countries.country_name
+```
+[Q1294]:
+https://leetcode.com/problems/weather-type-in-each-country/
 
+[**Q1303 Find the Team Size**][Q1303]
+```sql
+SELECT employee_id, team_size
+FROM Employee
+LEFT JOIN (SELECT team_id, COUNT(Employee_id) AS team_size
+           FROM Employee GROUP BY team_id) T1
+ON Employee.team_id = T1.team_id
+```
+[Q1303]:
+https://leetcode.com/problems/find-the-team-size/
+
+[**Q1322 Ads Performance**][Q1322]
+```sql
+SELECT ad_id, ROUND(COALESCE(Clicks/(Views+Clicks)*100,0), 2) AS ctr
+FROM
+    (SELECT ad_id, SUM(CASE action WHEN ""Clicked"" THEN 1 ELSE 0 END) AS Clicks, 
+                   SUM(CASE action WHEN ""Viewed"" THEN 1 ELSE 0 END) AS ""Views""
+     FROM Ads
+     GROUP BY ad_id) T1
+ORDER BY ctr DESC, ad_id
+```
+[Q1322]:
+https://leetcode.com/problems/ads-performance/
+
+[**Q1327 List the Products Ordered in a Period**][Q1327]
+```sql
+SELECT product_name, unit
+FROM (SELECT product_id, SUM(unit) AS unit
+      FROM Orders
+      WHERE order_date BETWEEN DATE(""2020-02-01"") AND DATE(""2020-02-29"")
+      GROUP BY product_id) T1
+LEFT JOIN Products
+ON T1.product_id = Products.product_id
+WHERE unit >= 100
+```
+[Q1327]:
+https://leetcode.com/problems/list-the-products-ordered-in-a-period/
+
+[**Q1350 Students With Invalid Departments**][Q1350]
+```sql
+SELECT Students.id, Students.name
+FROM Students
+LEFT JOIN Departments
+ON Students.department_id = Departments.id
+WHERE Departments.name IS NULL
+```
+[Q1350]:
+https://leetcode.com/problems/students-with-invalid-departments/
+
+[**Q1378 Replace Employee ID With The Unique Identifier**][Q1378]
+```sql
+SELECT unique_id, name
+FROM Employees
+LEFT JOIN EmployeeUNI
+ON Employees.id = EmployeeUNI.id
+```
+[Q1378]:
+https://leetcode.com/problems/replace-employee-id-with-the-unique-identifier/
+
+[**Q1407 Top Travellers**][Q1407]
+```sql
+SELECT name, COALESCE(tot_distance,0) AS travelled_distance
+FROM Users
+LEFT JOIN (SELECT user_id, SUM(distance) AS tot_distance
+           FROM Rides
+           GROUP BY user_id) T1
+ON Users.id = T1.user_id
+ORDER BY COALESCE(tot_distance,0) DESC, name
+```
+[Q1407]:
+https://leetcode.com/problems/top-travellers/
+
+[**Q1435 Create a Session Bar Chart**][Q1435]
+```sql
+SELECT T1.bin, COALESCE(T2.total,0) AS total
+FROM
+    (SELECT '[0-5>' AS bin
+     UNION ALL 
+     SELECT '[5-10>' AS bin
+     UNION ALL 
+     SELECT '[10-15>' AS bin
+     UNION ALL 
+     SELECT '15 or more' AS bin)T1
+    LEFT JOIN
+    (SELECT COUNT(session_id) AS total,
+      CASE WHEN duration/60 >= 0 AND duration/60 < 5 THEN ""[0-5>""
+            WHEN duration/60 >= 5 AND duration/60 < 10 THEN ""[5-10>""
+            WHEN duration/60 >= 10 AND duration/60 < 15 THEN ""[10-15>""
+            ELSE ""15 or more""
+      END AS bin
+     FROM Sessions
+     GROUP BY bin)T2
+     ON T1.bin = T2.bin
+```
+[Q1435]:
+https://leetcode.com/problems/create-a-session-bar-chart/
+
+[**Q1484 Group Sold Products By The Date**][Q1484]
+```sql
+SELECT sell_date, 
+       COUNT(DISTINCT product) AS num_sold,
+       GROUP_CONCAT(DISTINCT product ORDER BY product) AS products
+FROM Activities
+GROUP BY sell_date
+```
+[Q1484]:
+https://leetcode.com/problems/group-sold-products-by-the-date/
+
+[**Q1495 Friendly Movies Streamed Last Month**][Q1485]
+```sql
+SELECT DISTINCT title AS TITLE
+FROM TVProgram
+LEFT JOIN Content
+ON TVProgram.content_id = Content.content_id
+WHERE program_date BETWEEN DATE('2020-06-01') AND DATE('2020-06-30')
+    AND Kids_content = 'Y' AND content_type = 'Movies'
+```
+[Q1495]:
+https://leetcode.com/problems/friendly-movies-streamed-last-month/
