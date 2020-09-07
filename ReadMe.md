@@ -13,6 +13,7 @@ FROM Person
 LEFT JOIN Address
 ON Person.PersonId = Address.PersonId
 ```
+##### [**Back to Question List**](#question-list)
 [Q175]:
 https://leetcode.com/problems/combine-two-tables/
 
@@ -22,6 +23,7 @@ SELECT MAX(Salary) AS SecondHighestSalary
 FROM Employee
 WHERE Salary < (SELECT MAX(Salary) FROM Employee)
 ```
+##### [**Back to Question List**](#question-list)
 [Q176]:
 https://leetcode.com/problems/second-highest-salary/
 
@@ -34,6 +36,7 @@ FROM
     ON T1.ManagerId = T2.Id) T3
 WHERE Employee_Salary > Manager_Salary
 ```
+##### [**Back to Question List**](#question-list)
 [Q181]:
 https://leetcode.com/problems/employees-earning-more-than-their-managers/
 
@@ -44,6 +47,7 @@ FROM Person
 GROUP BY Email
 HAVING COUNT(Id)>1
 ```
+##### [**Back to Question List**](#question-list)
 [Q182]:
 https://leetcode.com/problems/duplicate-emails/
 
@@ -58,6 +62,7 @@ LEFT JOIN
 ON Customers.Id = T1.CustomerId
 WHERE T1.Order_Count IS NULL
 ```
+##### [**Back to Question List**](#question-list)
 [Q183]:
 https://leetcode.com/problems/customers-who-never-order/
 
@@ -71,6 +76,7 @@ FROM
 FROM Person
 GROUP BY Email) T1)
 ```
+##### [**Back to Question List**](#question-list)
 [Q196]:
 https://leetcode.com/problems/delete-duplicate-emails/
 
@@ -81,6 +87,7 @@ FROM Weather AS T1, Weather AS T2
 WHERE DATEDIFF(T1.RecordDate, T2.RecordDate) = 1 
 AND T1.Temperature > T2.Temperature
 ```
+##### [**Back to Question List**](#question-list)
 [Q197]:
 https://leetcode.com/problems/rising-temperature/
 
@@ -90,6 +97,7 @@ SELECT player_id, MIN(event_date) AS first_login
 FROM Activity
 GROUP BY player_id
 ```
+##### [**Back to Question List**](#question-list)
 [Q511]:
 https://leetcode.com/problems/game-play-analysis-i/
 
@@ -101,6 +109,7 @@ FROM
     FROM Activity) T1
 WHERE event_date = earliest
 ```
+##### [**Back to Question List**](#question-list)
 [Q512]:
 https://leetcode.com/problems/game-play-analysis-ii/
 
@@ -112,6 +121,7 @@ LEFT JOIN Bonus
 ON Employee.empId = Bonus.empId
 WHERE bonus < 1000 OR bonus is NULL
 ```
+##### [**Back to Question List**](#question-list)
 [Q577]:
 https://leetcode.com/problems/employee-bonus/
 
@@ -121,6 +131,7 @@ SELECT name
 FROM customer
 WHERE referee_id !=2 OR referee_id IS NULL
 ```
+##### [**Back to Question List**](#question-list)
 [Q584]:
 https://leetcode.com/problems/find-customer-referee/
 
@@ -138,6 +149,7 @@ WHERE order_count = (SELECT MAX(order_count)
                       FROM orders
                       GROUP BY customer_number) T2)
 ```
+##### [**Back to Question List**](#question-list)
 [Q586]:
 https://leetcode.com/problems/customer-placing-the-largest-number-of-orders/
 
@@ -147,6 +159,7 @@ SELECT name, population, area
 FROM World
 WHERE area > 3000000 OR population > 25000000
 ```
+##### [**Back to Question List**](#question-list)
 [Q595]:
 https://leetcode.com/problems/big-countries/
 
@@ -157,6 +170,7 @@ FROM courses
 GROUP BY class
 HAVING COUNT(DISTINCT student) >= 5
 ```
+##### [**Back to Question List**](#question-list)
 [Q596]:
 https://leetcode.com/problems/classes-more-than-5-students/
 
@@ -176,6 +190,7 @@ FROM
      FROM request_accepted
      GROUP BY requester_id, requester_id + accepter_id) T2) T2_1
 ```
+##### [**Back to Question List**](#question-list)
 [Q597]:
 https://leetcode.com/problems/friend-requests-i-overall-acceptance-rate/
 
@@ -190,6 +205,8 @@ ON current.seat_id = next.seat_id+1
 WHERE current.free = 1 AND COALESCE(current.free,0) + COALESCE(last.free,0) + COALESCE(next.free,0) >= 2
 ORDER BY current.seat_id
 ```
+##### [**Back to Question List**](#question-list)
+
 [Q603]:
 https://leetcode.com/problems/consecutive-available-seats/
 
@@ -204,6 +221,7 @@ WHERE salesperson.sales_id
             ON orders.com_id = company.com_id
             WHERE company.name = ""RED"")
 ```
+##### [**Back to Question List**](#question-list)
 [Q607]:
 https://leetcode.com/problems/sales-person/
 
@@ -216,6 +234,7 @@ SELECT x, y, z,
     END AS triangle
 FROM triangle
 ```
+##### [**Back to Question List**](#question-list)
 [Q610]:
 https://leetcode.com/problems/triangle-judgement/
 
@@ -227,6 +246,7 @@ FROM
     FROM point
     ORDER BY x) T1
 ```
+##### [**Back to Question List**](#question-list)
 [Q613]:
 https://leetcode.com/problems/shortest-distance-in-a-line/
 
@@ -239,6 +259,7 @@ FROM
      GROUP BY num
      HAVING COUNT(num)=1) T1
 ```
+##### [**Back to Question List**](#question-list)
 [Q619]:
 https://leetcode.com/problems/biggest-single-number/
 
@@ -249,6 +270,7 @@ FROM cinema
 WHERE id%2=1 AND description != 'boring'
 ORDER BY rating DESC
 ```
+##### [**Back to Question List**](#question-list)
 [Q620]:
 https://leetcode.com/problems/not-boring-movies/
 
@@ -260,6 +282,7 @@ SET sex = CASE sex
             ELSE 'm'
           END
 ```
+##### [**Back to Question List**](#question-list)
 [Q627]:
 https://leetcode.com/problems/swap-salary/
 
@@ -270,6 +293,7 @@ FROM ActorDirector
 GROUP BY actor_id, director_id
 HAVING COUNT(timestamp) >= 3
 ```
+##### [**Back to Question List**](#question-list)
 [Q1050]:
 https://leetcode.com/problems/actors-and-directors-who-cooperated-at-least-three-times/
 
@@ -280,6 +304,7 @@ FROM Sales
 LEFT JOIN Product
 ON Sales.product_id = Product.product_id
 ```
+##### [**Back to Question List**](#question-list)
 [Q1068]:
 https://leetcode.com/problems/product-sales-analysis-i/
 
@@ -289,6 +314,7 @@ SELECT product_id, SUM(quantity) AS total_quantity
 FROM Sales
 GROUP BY Sales.product_id
 ```
+##### [**Back to Question List**](#question-list)
 [Q1069]:
 https://leetcode.com/problems/product-sales-analysis-ii/
 
@@ -300,6 +326,7 @@ LEFT JOIN Employee
 ON Project.employee_id = Employee.employee_id
 GROUP BY project_id
 ```
+##### [**Back to Question List**](#question-list)
 [Q1075]:
 https://leetcode.com/problems/project-employees-i/
 
@@ -314,6 +341,7 @@ HAVING COUNT(employee_id) = (SELECT COUNT(employee_id)
                              ORDER BY COUNT(employee_id) DESC
                              LIMIT 1)
 ```
+##### [**Back to Question List**](#question-list)
 [Q1076]:
 https://leetcode.com/problems/project-employees-ii/
 
@@ -329,6 +357,7 @@ HAVING SUM(price) =
     ORDER BY SUM(price) DESC
     LIMIT 1)
 ```
+##### [**Back to Question List**](#question-list)
 [Q1082]:
 https://leetcode.com/problems/sales-analysis-i/
 
@@ -345,6 +374,7 @@ WHERE buyer_id NOT IN ( SELECT buyer_id
                         WHERE product_name ='iPhone')
 AND product_name = 'S8'
 ```
+##### [**Back to Question List**](#question-list)
 [Q1083]:
 https://leetcode.com/problems/sales-analysis-ii/
 
@@ -357,6 +387,7 @@ WHERE product_id NOT IN ( SELECT DISTINCT product_id
                         WHERE sale_date > DATE('2019-03-31')
                         OR sale_date < DATE('2019-01-01'))
 ```
+##### [**Back to Question List**](#question-list)
 [Q1084]:
 https://leetcode.com/problems/sales-analysis-iii/
 
@@ -368,6 +399,7 @@ WHERE action = 'report' AND action_date = DATE('2019-07-04')
 GROUP BY extra
 HAVING COUNT(DISTINCT post_id) > 0
 ```
+##### [**Back to Question List**](#question-list)
 [Q1113]:
 https://leetcode.com/problems/reported-posts/
 
@@ -378,6 +410,7 @@ FROM Activity
 WHERE activity_date BETWEEN DATE_ADD('2019-07-27', INTERVAL -29 DAY) AND DATE('2019-07-27')
 GROUP BY activity_date
 ```
+##### [**Back to Question List**](#question-list)
 [Q1141]:
 https://leetcode.com/problems/user-activity-for-the-past-30-days-i/
 
@@ -388,6 +421,7 @@ FROM Activity
 WHERE activity_date
     BETWEEN DATE_ADD('2019-07-27', INTERVAL -29 DAY) AND DATE('2019-07-27')
 ```
+##### [**Back to Question List**](#question-list)
 [Q1142]:
 https://leetcode.com/problems/user-activity-for-the-past-30-days-ii/
 
@@ -398,6 +432,7 @@ FROM Views
 WHERE author_id = viewer_id
 ORDER BY author_i
 ```
+##### [**Back to Question List**](#question-list)
 [Q1148]:
 https://leetcode.com/problems/article-views-i/
 
@@ -411,6 +446,7 @@ FROM
      (SELECT COUNT(delivery_id) AS Tot
       FROM Delivery) T2
 ```
+##### [**Back to Question List**](#question-list)
 [Q1173]:
 https://leetcode.com/problems/immediate-food-delivery-i/
 
@@ -437,6 +473,7 @@ FROM   (SELECT id,
         FROM Department) T1
 GROUP BY id
 ```
+##### [**Back to Question List**](#question-list)
 [Q1179]:
 https://leetcode.com/problems/reformat-department-table/
 
@@ -450,6 +487,7 @@ FROM
      FROM Queries) T1
 GROUP BY query_name
 ```
+##### [**Back to Question List**](#question-list)
 [Q1211]:
 https://leetcode.com/problems/queries-quality-and-percentage/
 
@@ -466,6 +504,7 @@ WHERE post_id IN (
     GROUP BY sub_id)
 GROUP BY post_id
 ```
+##### [**Back to Question List**](#question-list)
 [Q1241]:
 https://leetcode.com/problems/number-of-comments-per-post/
 
@@ -480,6 +519,7 @@ FROM
      WHERE purchase_date BETWEEN start_date AND end_date) T1
 GROUP BY product_id
 ```
+##### [**Back to Question List**](#question-list)
 [Q1251]:
 https://leetcode.com/problems/average-selling-price/
 
@@ -496,6 +536,7 @@ LEFT JOIN
 ON T1.Student_id = T2.Student_id AND T1.subject_name = T2.subject_name
 ORDER BY T1.student_id, T1.subject_name, COALESCE(T2.exam_counts,0) DESC
 ```
+##### [**Back to Question List**](#question-list)
 [Q1280]:
 https://leetcode.com/problems/students-and-examinations/
 
@@ -512,6 +553,7 @@ ON Weather.country_id = Countries.country_id
 WHERE Weather.day BETWEEN DATE("2019-11-01") AND DATE("2019-11-30")
 GROUP BY Countries.country_name
 ```
+##### [**Back to Question List**](#question-list)
 [Q1294]:
 https://leetcode.com/problems/weather-type-in-each-country/
 
@@ -523,6 +565,7 @@ LEFT JOIN (SELECT team_id, COUNT(Employee_id) AS team_size
            FROM Employee GROUP BY team_id) T1
 ON Employee.team_id = T1.team_id
 ```
+##### [**Back to Question List**](#question-list)
 [Q1303]:
 https://leetcode.com/problems/find-the-team-size/
 
@@ -536,6 +579,7 @@ FROM
      GROUP BY ad_id) T1
 ORDER BY ctr DESC, ad_id
 ```
+##### [**Back to Question List**](#question-list)
 [Q1322]:
 https://leetcode.com/problems/ads-performance/
 
@@ -550,6 +594,7 @@ LEFT JOIN Products
 ON T1.product_id = Products.product_id
 WHERE unit >= 100
 ```
+##### [**Back to Question List**](#question-list)
 [Q1327]:
 https://leetcode.com/problems/list-the-products-ordered-in-a-period/
 
@@ -561,6 +606,7 @@ LEFT JOIN Departments
 ON Students.department_id = Departments.id
 WHERE Departments.name IS NULL
 ```
+##### [**Back to Question List**](#question-list)
 [Q1350]:
 https://leetcode.com/problems/students-with-invalid-departments/
 
@@ -571,6 +617,7 @@ FROM Employees
 LEFT JOIN EmployeeUNI
 ON Employees.id = EmployeeUNI.id
 ```
+##### [**Back to Question List**](#question-list)
 [Q1378]:
 https://leetcode.com/problems/replace-employee-id-with-the-unique-identifier/
 
@@ -584,6 +631,7 @@ LEFT JOIN (SELECT user_id, SUM(distance) AS tot_distance
 ON Users.id = T1.user_id
 ORDER BY COALESCE(tot_distance,0) DESC, name
 ```
+##### [**Back to Question List**](#question-list)
 [Q1407]:
 https://leetcode.com/problems/top-travellers/
 
@@ -609,6 +657,7 @@ FROM
      GROUP BY bin)T2
      ON T1.bin = T2.bin
 ```
+##### [**Back to Question List**](#question-list)
 [Q1435]:
 https://leetcode.com/problems/create-a-session-bar-chart/
 
@@ -620,6 +669,7 @@ SELECT sell_date,
 FROM Activities
 GROUP BY sell_date
 ```
+##### [**Back to Question List**](#question-list)
 [Q1484]:
 https://leetcode.com/problems/group-sold-products-by-the-date/
 
@@ -632,5 +682,6 @@ ON TVProgram.content_id = Content.content_id
 WHERE program_date BETWEEN DATE('2020-06-01') AND DATE('2020-06-30')
     AND Kids_content = 'Y' AND content_type = 'Movies'
 ```
+##### [**Back to Question List**](#question-list)
 [Q1495]:
 https://leetcode.com/problems/friendly-movies-streamed-last-month/
