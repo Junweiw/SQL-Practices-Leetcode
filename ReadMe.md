@@ -685,3 +685,1034 @@ WHERE program_date BETWEEN DATE('2020-06-01') AND DATE('2020-06-30')
 ##### [**Back to Question List**](#question-list)
 [Q1495]:
 https://leetcode.com/problems/friendly-movies-streamed-last-month/
+
+#### [**Q177 Nth Highest Salary**][Q177]
+```sql
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+BEGIN
+  RETURN (
+      # Write your MySQL query statement below.
+      SELECT DISTINCT Salary
+      FROM    
+        (SELECT Id, Salary, DENSE_RANK() OVER(ORDER BY Salary DESC) AS Ranking
+         FROM Employee)T1
+      WHERE Ranking = N
+  );
+END
+```
+##### [**Back to Question List**](#question-list)
+[Q177]:
+https://leetcode.com/problems/nth-highest-salary/
+
+#### [**Q178 Rank Scores**][Q178]
+```sql
+SELECT Score, DENSE_RANK() OVER (ORDER BY score DESC) AS 'RANK'
+FROM Scores
+```
+##### [**Back to Question List**](#question-list)
+[Q178]:
+https://leetcode.com/problems/rank-scores/
+
+#### [**Q180 Consecutive Numbers**][Q180]
+```sql
+SELECT DISTINCT Num AS ConsecutiveNums
+FROM
+    (SELECT Num,lead(Num,1) OVER () AS LEAD_1, lead(Num,2) OVER() AS LEAD_2
+     FROM Logs)T1
+WHERE Num = LEAD_1 AND Num = LEAD_2 AND LEAD_1 = LEAD_2
+```
+##### [**Back to Question List**](#question-list)
+[Q180]:
+https://leetcode.com/problems/consecutive-numbers/
+
+#### [**Q184 Department Highest Salary**][Q184]
+```sql
+SELECT Department,Employee ,Salary
+FROM
+    (SELECT Employee.Name AS Employee, Department.name AS Department ,Salary, 
+     MAX(Salary) OVER (PARTITION BY Department.name) AS Department_max_salary
+     FROM Employee
+     LEFT JOIN Department
+     ON Employee.DepartmentId = Department.Id) T1
+WHERE Salary = Department_max_salary AND Department IS NOT NULL
+```
+##### [**Back to Question List**](#question-list)
+[Q184]:
+https://leetcode.com/problems/department-highest-salary/
+
+#### [**Q534 Game Play Analysis III**][Q534]
+```sql
+SELECT player_id, event_date, 
+SUM(games_played) OVER (PARTITION BY player_id ORDER BY event_date) AS games_played_so_far
+FROM Activity
+```
+##### [**Back to Question List**](#question-list)
+[Q534]:
+https://leetcode.com/problems/game-play-analysis-iii/
+
+#### [**Q550 Game Play Analysis IV**][Q550]
+```sql
+# Solution 1
+SELECT ROUND(Consecutive/player_counts,2) AS fraction
+FROM
+    (SELECT COUNT(T1.player_id) AS Consecutive
+     FROM
+        (SELECT player_id, event_date,
+         MIN(event_date) OVER(PARTITION BY player_id) AS frist_login,
+         event_date - MIN(event_date) OVER(PARTITION BY player_id) AS Day_To_Next
+         FROM Activity) T1
+     WHERE Day_To_Next = 1)T2,
+     (SELECT COUNT(DISTINCT player_id) AS player_counts FROM Activity)T3
+```
+
+```sql
+# Solution 2
+SELECT ROUND(COUNT(DISTINCT T2.player_id)/ COUNT( DISTINCT activity.player_id),2) AS fraction
+FROM
+    (SELECT T1.player_id, (event_date - first_login) AS day_diff
+        FROM
+        (SELECT player_id, event_date ,MIN(event_date) OVER (PARTITION BY player_id)    as first_login FROM activity) T1)T2, activity
+WHERE T2.day_diff = 1
+```
+##### [**Back to Question List**](#question-list)
+[Q550]:
+https://leetcode.com/problems/game-play-analysis-iv/
+
+#### [**Q570 Managers with at Least 5 Direct Reports**][Q570]
+```sql
+SELECT Employee.Name
+FROM (SELECT ManagerId
+     FROM Employee
+     GROUP BY ManagerId
+     HAVING COUNT(Id) >= 5) T2
+LEFT JOIN Employee
+ON T2.ManagerId = Employee.Id
+WHERE Employee.Name IS NOT NULL
+```
+##### [**Back to Question List**](#question-list)
+[Q570]:
+https://leetcode.com/problems/managers-with-at-least-5-direct-reports/
+
+#### [**Q574 Winning Candidate**][Q574]
+```sql
+SELECT Candidate.Name
+FROM Vote
+LEFT JOIN Candidate
+ON Vote.CandidateId = Candidate.id
+GROUP BY Candidate.Name
+ORDER BY COUNT(Vote.id) DESC
+LIMIT 1
+```
+##### [**Back to Question List**](#question-list)
+[Q574]:
+https://leetcode.com/problems/winning-candidate/
+
+#### [**Q578 Get Highest Answer Rate Question**][Q578]
+```sql
+SELECT question_id AS survey_log
+FROM survey_log
+GROUP BY question_id
+ORDER BY SUM(CASE WHEN action = 'ANSWER' THEN 1 ELSE 0 END)/SUM(CASE WHEN ACTION = 'SHOW' THEN 1 ELSE 0 END) DESC
+LIMIT 1
+```
+##### [**Back to Question List**](#question-list)
+[Q578]:
+https://leetcode.com/problems/get-highest-answer-rate-question/
+
+#### [**Q580 Count Student Number in Departments**][Q580]
+```sql
+SELECT dept_name, COALESCE(student_number,0) AS student_number
+FROM department
+LEFT JOIN
+    (SELECT dept_id, COUNT(student_id) AS student_number
+     FROM student
+     GROUP BY dept_id)T1
+ON department.dept_id = T1.dept_id
+ORDER BY COALESCE(student_number,0) DESC, dept_name
+```
+##### [**Back to Question List**](#question-list)
+[Q580]:
+https://leetcode.com/problems/count-student-number-in-departments/
+
+#### [**Q585 Investments in 2016**][Q585]
+```sql
+SELECT ROUND(SUM(TIV_2016),2) AS TIV_2016
+FROM insurance
+WHERE 
+    TIV_2015 IN (SELECT TIV_2015
+                 FROM insurance
+                 GROUP BY TIV_2015
+                 HAVING COUNT(PID) > 1)
+AND
+    LAT IN  (SELECT LAT
+             FROM insurance
+             GROUP BY LAT, LON
+             HAVING COUNT(PID) = 1)
+AND
+    LON IN  (SELECT LON
+             FROM insurance
+             GROUP BY LAT, LON
+             HAVING COUNT(PID) = 1)
+```
+##### [**Back to Question List**](#question-list)
+[Q585]:
+https://leetcode.com/problems/investments-in-2016/
+
+#### [**Q602 Friend Requests II: Who Has the Most Friends**][Q602]
+```sql
+SELECT id, SUM(friends) AS num
+FROM
+    (SELECT requester_id AS id, COALESCE(COUNT(requester_id),0) AS friends
+     FROM request_accepted
+     GROUP BY requester_id
+    UNION ALL
+     SELECT accepter_id AS id, COALESCE(COUNT(accepter_id),0) AS friends
+     FROM request_accepted
+     GROUP BY accepter_id) T1
+GROUP BY id
+ORDER BY num DESC
+LIMIT 1
+```
+##### [**Back to Question List**](#question-list)
+[Q602]:
+https://leetcode.com/problems/friend-requests-ii-who-has-the-most-friends/
+
+#### [**Q608 Tree Node**][Q608]
+```sql
+SELECT DISTINCT id AS Id, ""Root"" AS Type
+FROM tree
+WHERE p_id IS NULL
+UNION ALL
+SELECT DISTINCT id AS Id, ""Inner"" AS Type
+FROM tree
+WHERE id IN (SELECT DISTINCT p_id FROM tree) AND p_id IS NOT NULL
+UNION ALL
+SELECT DISTINCT id AS Id, ""Leaf"" AS Type
+FROM tree
+WHERE id NOT IN (SELECT DISTINCT p_id FROM tree WHERE p_id IS NOT NULL) AND p_id IS NOT NULL
+```
+##### [**Back to Question List**](#question-list)
+[Q608]:
+https://leetcode.com/problems/tree-node/
+
+#### [**Q612 Shortest Distance in a Plane**][Q612]
+```sql
+SELECT MIN(ROUND(SQRT(POWER(T2X - T1X, 2) + POWER(T2Y - T1Y, 2)), 2)) AS shortest
+FROM
+    (SELECT T1.x AS T1X, T1.y AS T1Y, T2.x AS T2X, T2.y AS T2Y
+     FROM point_2d AS T1
+     CROSS JOIN point_2d AS T2)T3
+WHERE T2X != T1X OR T2Y != T1Y
+```
+##### [**Back to Question List**](#question-list)
+[Q612]:
+https://leetcode.com/problems/shortest-distance-in-a-plane/
+
+#### [**Q614 Second Degree Follower**][Q614]
+```sql
+SELECT followee AS follower, COUNT(DISTINCT follower) AS num
+FROM follow
+WHERE followee IN (SELECT DISTINCT follower FROM follow)
+GROUP BY followee
+ORDER BY followee
+```
+##### [**Back to Question List**](#question-list)
+[Q614]:
+https://leetcode.com/problems/second-degree-follower/
+
+#### [**Q626 Exchange Seats**][Q626]
+```sql
+SELECT id-1 AS id, student
+FROM seat
+WHERE id%2 = 0
+UNION ALL
+SELECT id+1 AS id, student
+FROM seat
+WHERE id != (SELECT MAX(id) FROM seat) AND id%2 = 1
+UNION ALL
+SELECT id, student
+FROM seat
+WHERE id = (SELECT MAX(id) FROM seat) AND id%2 = 1
+ORDER BY id
+```
+##### [**Back to Question List**](#question-list)
+[Q626]:
+https://leetcode.com/problems/exchange-seats/
+
+#### [**Q1045 Customers Who Bought All Products**][Q1045]
+```sql
+SELECT customer_id
+FROM
+    (SELECT customer_id, product_key
+     FROM Customer
+     WHERE product_key IN (SELECT DISTINCT product_key FROM Product))T1
+GROUP BY customer_id
+HAVING COUNT(DISTINCT product_key) = (SELECT COUNT(DISTINCT product_key) FROM product)
+```
+##### [**Back to Question List**](#question-list)
+[Q1045]:
+https://leetcode.com/problems/customers-who-bought-all-products/
+
+#### [**Q1070 Product Sales Analysis III**][Q1070]
+```sql
+SELECT T1.product_id, T1.first_year, quantity, price
+FROM
+    (SELECT product_id, MIN(year) AS first_year
+     FROM Sales
+     GROUP BY product_id) T1
+LEFT JOIN Sales
+ON T1.product_id = Sales.product_id AND T1.first_year = Sales.year
+```
+##### [**Back to Question List**](#question-list)
+[Q1070]:
+https://leetcode.com/problems/product-sales-analysis-iii/
+
+#### [**Q1077 Project Employees III**][Q1077]
+```sql
+SELECT project_id, employee_id
+FROM (SELECT project_id, Employee.employee_id, experience_years, 
+      MAX(experience_years) OVER(PARTITION BY project_id) AS project_max_exp
+      FROM Project
+      LEFT JOIN Employee
+      ON Project.employee_id = Employee.employee_id)T1
+WHERE T1.experience_years = T1.project_max_exp
+```
+##### [**Back to Question List**](#question-list)
+[Q1077]:
+https://leetcode.com/problems/project-employees-iii/
+
+#### [**Q1098 Unpopular Books**][Q1098]
+```sql
+SELECT T1.book_id, name
+FROM 
+    (SELECT book_id, name 
+     FROM Books
+     WHERE available_from < DATE('2019-05-23'))T1
+     LEFT JOIN 
+    (SELECT book_id, SUM(quantity) AS quantity
+     FROM Orders
+     WHERE dispatch_date BETWEEN DATE('2018-06-23') AND DATE('2019-06-23')
+     GROUP BY book_id)T2
+    ON T1.book_id = T2.book_id
+WHERE COALESCE(quantity, 0) < 10
+```
+##### [**Back to Question List**](#question-list)
+[Q1098]:
+https://leetcode.com/problems/unpopular-books/
+
+#### [**Q1107 New Users Daily Count**][Q1107]
+```sql
+SELECT first_date AS login_date, COUNT(user_id) AS user_count
+FROM
+    (SELECT user_id, MIN(activity_date) AS first_date
+     FROM Traffic
+     WHERE activity = 'login'
+     GROUP BY user_id)T1
+WHERE first_date BETWEEN DATE_ADD(('2019-06-30'), INTERVAL -90 DAY) AND DATE('2019-06-30')
+GROUP BY first_date 
+```
+##### [**Back to Question List**](#question-list)
+[Q1107]:
+https://leetcode.com/problems/new-users-daily-count/
+
+#### [**Q1112 Highest Grade For Each Student**][Q1112]
+```sql
+SELECT student_id, MIN(course_id) AS course_id, grade
+FROM
+    (SELECT student_id, course_id, grade, 
+     MAX(grade) OVER (PARTITION BY student_id) AS highest_grade
+     FROM Enrollments)T1
+WHERE grade = highest_grade
+GROUP BY student_id
+ORDER BY student_id
+```
+##### [**Back to Question List**](#question-list)
+[Q1112]:
+https://leetcode.com/problems/highest-grade-for-each-student/
+
+#### [**Q1126 Active Businesses**][Q1126]
+```sql
+SELECT business_id
+FROM (SELECT business_id, event_type, occurences, 
+      AVG(occurences) OVER(PARTITION BY event_type) AS event_average
+      FROM Events) T1
+WHERE occurences > event_average
+GROUP BY business_id
+HAVING COUNT(business_id) > 1
+```
+##### [**Back to Question List**](#question-list)
+[Q1126]:
+https://leetcode.com/problems/active-businesses/
+
+#### [**Q1132 Reported Posts II**][Q1132]
+```sql
+# Solution 1
+SELECT ROUND(AVG(rates)*100,2) AS average_daily_percent
+FROM
+  (SELECT action_date, SUM(removed)/COUNT(post_id) AS rates   
+   FROM
+    (SELECT DISTINCT action_date,  post_id, 
+     CASE
+        WHEN post_id IN (SELECT DISTINCT post_id FROM Removals) 
+        THEN 1 ELSE 0 END AS removed
+     FROM Actions
+     WHERE extra = 'spam')T1
+   GROUP BY action_date)T2
+```
+
+```sql
+# Solution 2
+SELECT ROUND(AVG(rates)*100,2) AS average_daily_percent
+FROM
+    (SELECT T1.action_date, COALESCE(T2.removes,0)/T1.spam AS rates 
+     FROM
+        (SELECT action_date, COUNT(DISTINCT post_id) AS spam
+         FROM Actions
+         WHERE extra = 'spam'
+         GROUP BY action_date)T1
+     LEFT JOIN 
+        (SELECT action_date, COUNT(DISTINCT Actions.post_id) AS removes
+         FROM Actions
+         LEFT JOIN Removals
+         ON Actions.post_id = Removals.post_id
+         WHERE extra = 'spam' AND remove_date IS NOT NULL
+         GROUP BY action_date)T2
+     ON T1.action_date = T2.action_date)T3
+```
+
+```sql
+# Solution 3
+SELECT ROUND(AVG(COALESCE(removal,0)/COALESCE(spam,0))*100,2) AS average_daily_percent
+FROM
+        (SELECT action_date, COUNT(DISTINCT post_id) AS removal
+         FROM
+            (SELECT Actions.post_id, action_date, remove_date
+ 	         FROM Actions
+ 	         LEFT JOIN Removals
+ 	         ON Actions.post_id = Removals.post_id
+ 	         WHERE extra = 'spam') T1
+     	 WHERE remove_date IS NOT NULL
+		 GROUP BY action_date)T2
+
+	RIGHT JOIN
+
+    (SELECT action_date, COUNT(DISTINCT post_id) AS spam
+     FROM
+        (SELECT actions.post_id, action_date, remove_date
+ 	     FROM Actions
+ 	     LEFT JOIN Removals
+ 	     ON Actions.post_id = Removals.post_id
+ 	     WHERE extra = 'spam') T3
+     GROUP BY action_date)T4
+	ON T2.action_date = T4.action_date
+```
+##### [**Back to Question List**](#question-list)
+[Q1132]:
+https://leetcode.com/problems/reported-posts-ii/
+
+#### [**Q1149 Article Views II**][Q1149]
+```sql
+SELECT DISTINCT viewer_id AS id
+FROM Views
+GROUP BY viewer_id, view_date
+HAVING COUNT(DISTINCT article_id)  > 1
+ORDER BY viewer_id
+```
+##### [**Back to Question List**](#question-list)
+[Q1149]:
+https://leetcode.com/problems/article-views-ii/
+
+#### [**Q1158 Market Analysis I**][Q1158]
+```sql
+SELECT user_id AS buyer_id, join_date, COALESCE(order_count,0) AS orders_in_2019
+FROM Users
+LEFT JOIN
+    (SELECT buyer_id, COUNT(order_id) AS order_count
+     FROM Orders
+     WHERE order_date BETWEEN DATE('2019-01-01') AND DATE('2019-12-31')
+     GROUP BY buyer_id)T1
+ON T1.buyer_id = users.user_id
+```
+##### [**Back to Question List**](#question-list)
+[Q1158]:
+https://leetcode.com/problems/market-analysis-i/
+
+#### [**Q1164 Product Price at a Given Date**][Q1164]
+```sql
+SELECT T3.product_id, COALESCE(new_price, 10) AS price
+FROM
+  (SELECT T1.product_id, T2.latest_change_date
+   FROM
+    (SELECT DISTINCT product_id FROM Products)T1
+     LEFT JOIN
+    (SELECT product_id, Max(change_date) AS latest_change_date
+     FROM Products
+     WHERE change_date <= DATE('2019-08-16')
+     GROUP BY product_id)T2
+     ON T1.product_id = T2.product_id)T3
+   LEFT JOIN Products
+   ON T3.product_id = Products.product_id AND T3.latest_change_date = Products.change_date
+```
+##### [**Back to Question List**](#question-list)
+[Q1164]:
+https://leetcode.com/problems/product-price-at-a-given-date/
+
+#### [**Q1174 Immediate Food Delivery II**][Q1174]
+```sql
+SELECT ROUND(SUM(immediate)/COUNT(delivery_id)*100,2) AS immediate_percentage
+FROM
+    (SELECT Delivery.delivery_id, T1.first_order, Delivery.customer_pref_delivery_date,
+     CASE T1.first_order WHEN Delivery.customer_pref_delivery_date THEN 1 ELSE 0 END AS immediate
+     FROM
+        (SELECT customer_id, MIN(order_date) AS first_order
+         FROM Delivery
+         GROUP BY customer_id)T1
+         LEFT JOIN Delivery
+         ON T1.customer_id = Delivery.customer_id AND T1.first_order = Delivery.order_date)T2
+```
+##### [**Back to Question List**](#question-list)
+[Q1174]:
+https://leetcode.com/problems/immediate-food-delivery-ii/
+
+#### [**Q1193 Monthly Transactions I**][Q1193]
+```sql
+WITH Transaction_table (id, country, approved, amount, month) 
+    AS( SELECT id, country, 
+               CASE state WHEN ""approved"" THEN 1 ELSE 0 END AS approved,
+               amount, DATE_FORMAT(trans_date, '%Y-%m') AS month
+        FROM Transactions)
+      
+SELECT T1.month, T1.country, trans_count, approved_count, trans_total_amount, COALESCE(approved_total_amount,0) AS approved_total_amount
+FROM
+    (SELECT month, country, COUNT(id) AS trans_count, SUM(approved) AS approved_count, SUM(amount) AS trans_total_amount
+     FROM transaction_table
+     GROUP BY month, country)T1
+LEFT JOIN
+    (SELECT month, country, SUM(amount) AS approved_total_amount
+     FROM transaction_table
+     WHERE approved = 1
+     GROUP BY month, country)T2
+ON T1.month = T2.month AND T1.country = T2.country
+```
+##### [**Back to Question List**](#question-list)
+[Q1193]:
+https://leetcode.com/problems/monthly-transactions-i/
+
+#### [**Q1204 Monthly Transactions I**][Q1204]
+```sql
+SELECT person_name
+FROM
+    (SELECT SUM(weight) OVER(ORDER BY turn) AS tot_weight, turn, person_name
+     FROM Queue)T1
+WHERE tot_weight <= 1000
+ORDER BY turn DESC
+LIMIT 1
+```
+##### [**Back to Question List**](#question-list)
+[Q1204]:
+https://leetcode.com/problems/last-person-to-fit-in-the-elevator/
+
+#### [**Q1205 Monthly Transactions II**][Q1205]
+```sql
+WITH Tot_trans (id, country, approved, amount, trans_month, chargeback_month, charge_backs) AS 
+    (SELECT id, country, approved, amount, trans_month, chargeback_month,
+       CASE WHEN chargeback_month IS NULL THEN 0 ELSE 1 END AS charge_backs
+     FROM
+        (SELECT id, country, 
+         CASE state WHEN 'approved' THEN 1 ELSE 0 END AS approved, amount,
+         DATE_FORMAT(trans_date, '%Y-%m') AS trans_month
+         FROM Transactions)T1
+     LEFT JOIN
+        (SELECT trans_id, DATE_FORMAT(trans_date,'%Y-%m') AS chargeback_month
+         FROM Chargebacks)T2
+     ON T1.id = T2.trans_id),
+     T3 (month, country, approved_count, approved_amount) AS
+     (SELECT trans_month AS month, country, SUM(approved) AS approved_count,
+     SUM(amount) AS approved_amount
+     FROM Tot_trans
+     WHERE approved = 1
+     GROUP BY trans_month, country),
+     T4 (month, country, chargeback_count, chargeback_amount) AS
+     (SELECT chargeback_month AS month, country, 
+     SUM(charge_backs) AS chargeback_count, SUM(amount) AS chargeback_amount
+     FROM Tot_trans
+     WHERE charge_backs = 1
+     GROUP BY chargeback_month, country)
+
+SELECT *
+FROM
+    (SELECT T3.month, T3.country, COALESCE(approved_count,0) AS
+     approved_count, COALESCE(approved_amount,0) AS approved_amount,
+     COALESCE(chargeback_count,0) AS chargeback_count,
+     COALESCE(chargeback_amount,0) AS chargeback_amount
+     FROM T3 LEFT JOIN T4
+     ON T3.month = T4.month AND T3.country = T4.country
+     UNION
+     SELECT T4.month, T4.country, COALESCE(approved_count,0) AS
+     approved_count, COALESCE(approved_amount,0) AS approved_amount,
+     COALESCE(chargeback_count,0) AS chargeback_count,
+     COALESCE(chargeback_amount,0) AS chargeback_amount
+     FROM T3 RIGHT JOIN T4
+     ON T3.month = T4.month AND T3.country = T4.country)T5
+WHERE approved_count != 0 OR approved_amount != 0 OR chargeback_count != 0 OR chargeback_amount != 0
+```
+##### [**Back to Question List**](#question-list)
+[Q1205]:
+https://leetcode.com/problems/monthly-transactions-ii/
+
+#### [**Q1212 Monthly Transactions I**][Q1212]
+```sql
+WITH Points (match_id,host_team, guest_team, host_points, guest_points ) AS(
+    SELECT match_id ,host_team, guest_team, 
+       CASE 
+        WHEN host_goals > guest_goals THEN 3
+        WHEN host_goals = guest_goals THEN 1
+        ELSE 0 END AS host_points,
+       CASE
+        WHEN guest_goals > host_goals THEN 3
+        WHEN guest_goals = host_goals THEN 1
+        ELSE 0 END AS guest_points
+    FROM Matches)
+    
+SELECT Teams.team_id, Team_name, COALESCE(SUM(num_points),0) AS num_points
+FROM Teams
+LEFT JOIN
+    (SELECT host_team AS team_id, SUM(host_points) AS num_points
+     FROM Points
+     GROUP BY host_team
+     UNION ALL
+     SELECT guest_team AS team_id, SUM(guest_points) AS num_point
+     FROM Points
+     GROUP BY guest_team)T1
+ON Teams.team_id = T1.team_id
+GROUP BY team_id
+ORDER BY COALESCE(SUM(num_points),0) DESC, team_id
+```
+##### [**Back to Question List**](#question-list)
+[Q1212]:
+https://leetcode.com/problems/team-scores-in-football-tournament/
+
+#### [**Q1264 Page Recommendations**][Q1264]
+```sql
+SELECT page_id AS recommended_page
+FROM
+    (SELECT DISTINCT page_id
+     FROM Likes
+     WHERE user_id IN 
+        (SELECT user2_id
+         FROM Friendship
+         WHERE user1_id = 1
+         UNION
+         SELECT user1_id
+         FROM Friendship
+         WHERE user2_id =1))T1
+WHERE page_id NOT IN
+    (SELECT DISTINCT page_id
+     FROM Likes
+     WHERE user_id = 1)
+```
+##### [**Back to Question List**](#question-list)
+[Q1264]:
+https://leetcode.com/problems/page-recommendations/
+
+#### [**Q1270 All People Report to the Given Manager**][Q1270]
+```sql
+SELECT DISTINCT employee_id
+FROM Employees
+WHERE manager_id = 1 AND employee_id !=1
+OR 
+manager_id IN
+    (SELECT employee_id
+     FROM Employees
+     WHERE manager_id = 1 AND employee_id != 1)
+OR manager_id IN 
+    (SELECT employee_id
+     FROM Employees
+     WHERE manager_id IN
+        (SELECT employee_id
+         FROM Employees
+         WHERE manager_id = 1 AND employee_id != 1))
+```
+##### [**Back to Question List**](#question-list)
+[Q1270]:
+https://leetcode.com/problems/all-people-report-to-the-given-manager/
+
+#### [**Q1285 Find the Start and End Number of Continuous Ranges**][Q1285]
+```sql
+WITH Diff (log_id, last_log_id, last_diff, next_log_id, next_diff, start_id, end_id)
+AS 
+    (SELECT log_id, LAG(log_id, 1) OVER() AS last_log_id, log_id - LAG(log_id, 1) OVER() AS last_diff, 
+            LEAD(log_id, 1) OVER() AS next_log_id, log_id - LEAD(log_id, 1) OVER() AS next_diff,
+            CASE WHEN log_id - LAG(log_id, 1) OVER() != 1 THEN "yes"
+                 WHEN log_id - LAG(log_id, 1) OVER() IS NULL THEN "yes" 
+                 ELSE "no" END AS start_id,
+            CASE WHEN log_id - LEAD(log_id, 1) OVER() != -1 THEN "yes"
+                 WHEN log_id - LEAD(log_id, 1) OVER() IS NULL THEN "yes"   
+                 ELSE "no" END AS end_id
+    FROM Logs)
+
+SELECT T1.log_id AS start_id, T2.log_id AS end_id
+FROM
+    (SELECT ROW_NUMBER() OVER() AS row_num, log_id
+     FROM Diff
+     WHERE start_id = "yes") T1
+    LEFT JOIN 
+    (SELECT ROW_NUMBER() OVER() AS row_num, log_id
+     FROM Diff
+     WHERE end_id = "yes") T2
+    ON T1.row_num = T2.row_num
+```
+##### [**Back to Question List**](#question-list)
+[Q1285]:
+https://leetcode.com/problems/find-the-start-and-end-number-of-continuous-ranges/
+
+#### [**Q1308 Running Total for Different Genders**][Q1308]
+```sql
+SELECT gender, day, SUM(score_points) OVER (PARTITION BY gender ORDER BY day) AS total
+FROM Scores
+```
+##### [**Back to Question List**](#question-list)
+[Q1308]:
+https://leetcode.com/problems/running-total-for-different-genders/
+
+#### [**Q1321 Restaurant Growth**][Q1321]
+```sql
+SELECT visited_on, amount, ROUND(amount/7,2) AS average_amount
+FROM
+    (SELECT visited_on, current_amount +
+                   LAG(current_amount,1) OVER(ORDER BY visited_on)+
+                   LAG(current_amount,2) OVER(ORDER BY visited_on)+
+                   LAG(current_amount,3) OVER(ORDER BY visited_on)+
+                   LAG(current_amount,4) OVER(ORDER BY visited_on)+
+                   LAG(current_amount,5) OVER(ORDER BY visited_on)+
+                   LAG(current_amount,6) OVER(ORDER BY visited_on) AS amount             
+    FROM
+        (SELECT visited_on, SUM(amount) AS current_amount
+         FROM Customer
+         GROUP BY visited_on)T1)T2
+WHERE amount IS NOT NULL
+```
+##### [**Back to Question List**](#question-list)
+[Q1321]:
+https://leetcode.com/problems/restaurant-growth/
+
+#### [**Q1341 Movie Rating**][Q1341]
+```sql
+(SELECT name AS results
+ FROM
+ (SELECT user_id, COUNT(movie_id) AS movie_rated
+  FROM Movie_Rating
+  GROUP BY user_id)T1
+ LEFT JOIN Users
+ ON T1.user_id = Users.user_id
+ ORDER BY movie_rated DESC, name
+ LIMIT 1)
+
+UNION
+
+(SELECT title
+ FROM
+ (SELECT movie_id, AVG(rating) AS avg_rating
+  FROM Movie_Rating
+  WHERE created_at BETWEEN DATE('2020-02-01') AND DATE('2020-02-29')
+  GROUP BY movie_id)T2
+ LEFT JOIN Movies
+ ON T2.movie_id = Movies.movie_id
+ ORDER BY avg_rating DESC, title
+ LIMIT 1)
+ ```
+##### [**Back to Question List**](#question-list)
+[Q1341]:
+https://leetcode.com/problems/movie-rating/
+
+#### [**Q1355 Activity Participants**][Q1355]
+```sql
+WITH Activity (activity, participants) AS
+(SELECT activity, COUNT(id) AS participants
+ FROM Friends
+ GROUP BY activity)
+ 
+SELECT activity
+FROM Activity
+WHERE 
+    participants > (SELECT MIN(participants) FROM Activity) 
+    AND 
+    participants < (SELECT MAX(participants) FROM Activity)
+```
+##### [**Back to Question List**](#question-list)
+[Q1355]:
+https://leetcode.com/problems/activity-participants/
+
+#### [**Q1364 Number of Trusted Contacts of a Customer**][Q1364]
+```sql
+SELECT invoice_id, customer_name, price,COALESCE(contact_cnt,0) AS contacts_cnt, COALESCE(trusted_contacts_cnt,0) AS trusted_contacts_cnt
+FROM Invoices
+LEFT JOIN
+   (SELECT customer_id, customer_name, contact_cnt, trusted_contacts_cnt
+    FROM
+        (SELECT customer_id, customer_name, contact_cnt
+         FROM Customers
+         LEFT JOIN
+        (SELECT user_id, COUNT(contact_name) AS contact_cnt
+         FROM Contacts
+         GROUP BY user_id)T1
+        ON Customers.customer_id = T1.user_id)T2
+    LEFT JOIN 
+        (SELECT user_id, COUNT(contact_name) AS trusted_contacts_cnt
+         FROM Contacts
+         WHERE contact_name IN (SELECT DISTINCT customer_name FROM Customers)
+         GROUP BY user_id)T3
+    ON T2.customer_id = T3.user_id)T4
+ON Invoices.user_id = T4.customer_id
+ORDER BY invoice_id
+```
+##### [**Back to Question List**](#question-list)
+[Q1364]:
+https://leetcode.com/problems/number-of-trusted-contacts-of-a-customer/
+
+#### [**Q1393 Capital Gain/Loss**][Q1393]
+```sql
+SELECT stock_name, SUM(gain) AS capital_gain_loss
+FROM
+    (SELECT stock_name, operation, operation_day, 
+       CASE operation 
+       WHEN ""Buy"" THEN price*-1 
+       WHEN ""Sell"" THEN price END AS gain
+     FROM Stocks)T1
+GROUP BY stock_name
+```
+##### [**Back to Question List**](#question-list)
+[Q1393]:
+https://leetcode.com/problems/capital-gainloss/
+
+#### [**Q1398 Customers Who Bought Products A and B but Not C**][Q1398]
+```sql
+SELECT customer_id, customer_name
+FROM Customers
+WHERE customer_id IN
+    (SELECT DISTINCT customer_id AS A_buyer
+     FROM Orders
+     WHERE product_name = "A") 
+     AND
+     customer_id IN 
+     (SELECT DISTINCT customer_id AS A_buyer
+     FROM Orders
+     WHERE product_name = "B")
+     AND
+     customer_id NOT IN
+     (SELECT DISTINCT customer_id AS A_buyer
+     FROM Orders
+     WHERE product_name = "C") 
+```
+##### [**Back to Question List**](#question-list)
+[Q1398]:
+https://leetcode.com/problems/customers-who-bought-products-a-and-b-but-not-c/
+
+#### [**Q1421 NPV Queries**][Q1421]
+```sql
+SELECT Queries.id, Queries.year, COALESCE(npv,0) AS npv
+FROM Queries
+LEFT JOIN NPV
+ON Queries.id = NPV.id AND Queries.year = NPV.year
+ORDER BY Queries.id
+```
+##### [**Back to Question List**](#question-list)
+[Q1421]:
+https://leetcode.com/problems/npv-queries/
+
+#### [**Q1440 Evaluate Boolean Expression**][Q1440]
+```sql
+WITH 
+Expression (ROW_ID, left_operand, operator, right_operand) AS
+(SELECT ROW_NUMBER()OVER(ORDER BY left_operand) AS row_id,
+ left_operand, operator, right_operand FROM Expressions),
+
+New_form (row_id, left_value, left_operand, operator, right_value, right_operand, diff) AS
+(SELECT T1.row_id, left_value, left_operand, operator, right_value, right_operand, left_value - right_value
+ FROM
+    (SELECT row_id, left_operand, value AS left_value, operator
+     FROM Expression
+     LEFT JOIN Variables
+     ON Expression.left_operand = Variables.name)T1
+ LEFT JOIN 
+    (SELECT row_id, right_operand, value AS right_value
+     FROM Expression
+     LEFT JOIN Variables
+     ON Expression.right_operand = Variables.name)T2
+ ON T1.row_id = T2.row_id)
+ 
+SELECT left_operand, operator, right_operand, 
+CASE 
+    WHEN diff > 0 AND operator = ">" THEN "true"
+    WHEN diff = 0 AND operator = "=" THEN "true"
+    WHEN diff < 0 AND operator = "<" THEN "true"
+    ELSE "false" END AS value
+FROM New_form
+```
+##### [**Back to Question List**](#question-list)
+[Q1440]:
+https://leetcode.com/problems/evaluate-boolean-expression/
+
+#### [**Q1445 Apples & Oranges**][Q1445]
+```sql
+SELECT Sales_dates.sale_date, apple_sold - orange_sold AS diff
+FROM
+    (SELECT DISTINCT sale_date
+     FROM Sales) Sales_dates
+    LEFT JOIN 
+    (SELECT sale_date, SUM(sold_num) AS apple_sold
+     FROM Sales
+     WHERE fruit = 'apples'
+     GROUP BY sale_date) Apple
+    ON Sales_dates.sale_date = Apple.sale_date
+    LEFT JOIN 
+    (SELECT sale_date, SUM(sold_num) AS orange_sold
+    FROM Sales
+    WHERE fruit = 'oranges'
+    GROUP BY sale_date) Orange
+    ON Apple.sale_date = Orange.sale_date
+```
+##### [**Back to Question List**](#question-list)
+[Q1445]:
+https://leetcode.com/problems/apples-oranges/
+
+#### [**Q1454 Active Users**][Q1454]
+```sql
+SELECT DISTINCT T2.id, name
+FROM
+    (SELECT id,
+     LEAD(login_date, 4) OVER (PARTITION BY id ORDER BY login_date) AS next_4th_login,
+     DATE_ADD(login_date, INTERVAL 4 DAY) AS next_4_day
+     FROM
+        (SELECT DISTINCT id, login_date
+         FROM Logins)T1)T2
+LEFT JOIN Accounts
+ON T2.id = Accounts.id
+WHERE next_4th_login = next_4_day
+ORDER BY T2.id
+```
+##### [**Back to Question List**](#question-list)
+[Q1454]:
+https://leetcode.com/problems/active-users/
+
+#### [**Q1459 Rectangles Area**][Q1459]
+```sql
+SELECT P1.id AS p1, P2.id AS p2, 
+    ABS(P1.x_value - P2.x_value) * ABS(P1.y_value - P2.y_value) AS area
+FROM Points AS P1, Points AS P2
+WHERE P1.id < P2.id 
+  AND ABS(P1.x_value - P2.x_value) * ABS(P1.y_value - P2.y_value) != 0
+ORDER BY ABS(P1.x_value - P2.x_value) * ABS(P1.y_value - P2.y_value) DESC, P1.id, P2.id
+```
+##### [**Back to Question List**](#question-list)
+[Q1459]:
+https://leetcode.com/problems/rectangles-area/
+
+#### [**Q1468 Calculate Salaries**][Q1468]
+```sql
+WITH rate (company_id, employee_id, employee_name, company_max, origin_salary)
+AS (SELECT company_id, employee_id, employee_name, 
+       MAX(salary) OVER(PARTITION BY company_id) AS company_max, salary
+    FROM Salaries)
+    
+SELECT company_id, employee_id, employee_name, 
+       CASE
+        WHEN company_max < 1000 THEN origin_salary
+        WHEN company_max BETWEEN 1000 AND 10000 THEN ROUND((1-0.24)*origin_salary,0)
+        ELSE ROUND((1-0.49)*origin_salary,0) END AS salary
+FROM rate
+```
+##### [**Back to Question List**](#question-list)
+[Q1468]:
+https://leetcode.com/problems/calculate-salaries/
+
+#### [**Q1468 Calculate Salaries**][Q1468]
+```sql
+WITH rate (company_id, employee_id, employee_name, company_max, origin_salary)
+AS (SELECT company_id, employee_id, employee_name, 
+       MAX(salary) OVER(PARTITION BY company_id) AS company_max, salary
+    FROM Salaries)
+    
+SELECT company_id, employee_id, employee_name, 
+       CASE
+        WHEN company_max < 1000 THEN origin_salary
+        WHEN company_max BETWEEN 1000 AND 10000 THEN ROUND((1-0.24)*origin_salary,0)
+        ELSE ROUND((1-0.49)*origin_salary,0) END AS salary
+FROM rate
+```
+##### [**Back to Question List**](#question-list)
+[Q1468]:
+https://leetcode.com/problems/calculate-salaries/
+
+#### [**Q1501 Calculate Salaries**][Q1501]
+```sql
+# Solution 1
+WITH 
+Persons AS
+(SELECT SUBSTRING_INDEX(phone_number,""-"",1) AS country_code, id, name, phone_number FROM Person), 
+
+Person_country AS 
+(SELECT id, Persons.name, phone_number, Country.name AS country
+ FROM Persons
+ LEFT JOIN Country
+ ON Persons.country_code = Country.country_code)
+
+SELECT country
+FROM(
+    SELECT country, AVG(duration) AS country_duration
+    FROM
+        (SELECT country, duration
+         FROM Calls
+         LEFT JOIN Person_country
+         ON Calls.caller_id = Person_country.id
+         UNION ALL
+         SELECT country, duration
+         FROM Calls
+         LEFT JOIN Person_country
+         ON Calls.callee_id = Person_country.id)T1
+    GROUP BY country)T2
+WHERE country_duration > (SELECT AVG(duration) FROM Calls)
+```
+
+```sql
+# Solution 2
+WITH duration AS 
+    (SELECT caller_id AS id, duration FROM Calls
+     UNION ALL
+     SELECT callee_id AS id, duration FROM Calls),
+     persons AS(
+     SELECT id, SUBSTRING_INDEX(phone_number, '-', 1) AS country_code
+     FROM person)
+    
+SELECT DISTINCT country
+FROM    
+   (SELECT country, AVG(duration) OVER (PARTITION BY country) AS country_avg,
+    AVG(duration) OVER(PARTITION BY NULL) AS global_avg
+    FROM duration
+    LEFT JOIN
+    (SELECT id, Country.name AS country
+    FROM persons LEFT JOIN Country
+    ON persons.country_code = Country.country_code)T1
+    ON duration.id = T1.id)T2
+WHERE country_avg > global_avg
+```
+
+##### [**Back to Question List**](#question-list)
+[Q1501]:
+https://leetcode.com/problems/countries-you-can-safely-invest-in/
+
+#### [**Q1532 The Most Recent Three Orders**][Q1532]
+```sql
+SELECT name AS customer_name, T1.customer_id, order_id, order_date
+FROM
+    (SELECT order_id, order_date, customer_id, 
+       RANK() OVER (PARTITION BY customer_id ORDER BY order_date DESC) AS order_counts
+     FROM Orders)T1
+LEFT JOIN Customers
+ON T1.Customer_id = Customers.customer_id
+WHERE order_counts <=3
+ORDER BY namE, T1.customer_id, order_date DESC
+```
+##### [**Back to Question List**](#question-list)
+[Q1532]:
+https://leetcode.com/problems/the-most-recent-three-orders/
