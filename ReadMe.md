@@ -5,6 +5,12 @@ This file includes my solutions to LeetCode SQL questions in MySQL.
 ### Easy
 [Q175](#q175-combine-two-tables) | [Q176](#q176-second-highest-salary) | [Q181](#q181-employees-earning-more-than-their-managers) | [Q182](#q182-duplicate-emails) | [Q183](#q183-customers-who-never-order) | [Q196](#q196-delete-duplicate-emails) |[Q197](#q197-rising-temperature) | [Q511](#q511-game-play-analysis-i) | [Q512](#q512-game-play-analysis-ii) | [Q577](#q577-employee-bonus) | [Q584](#q584-find-customer-referee) | [Q586](#q586-customer-placing-the-largest-number-of-orders) | [Q595](#q595-big-countries) | [Q596](#q596-classes-more-than-5-students) | [Q597](#q597-friend-requests-i-overall-acceptance-rate) | [Q603](#q603-consecutive-available-seats) | [Q607](#q607-sales-person) | [Q610](#q610-triangle-judgement) | [Q613](#q613-shortest-distance-in-a-line) | [Q619](#q619-biggest-single-number) | [Q620](#q620-not-boring-movies) | [Q627](#q627-swap-salary) | [Q1050](#q1050-actors-and-directors-who-cooperated-at-least-three-times) | [Q1068](#q1068-product-sales-analysis-i) | [Q1069](#q1069-product-sales-analysis-ii) | [Q1075](#q1075-project-employees-i) | [Q1076](#q1076-project-employees-ii) | [Q1082](#q1082-sales-analysis-i) | [Q1083](#q1083-sales-analysis-ii) | [Q1084](#q1084-sales-analysis-iii) | [Q1113](#q1113-reported-posts) | [Q1141](#q1141-user-activity-for-the-past-30-days-i) | [Q1142](#q1142-user-activity-for-the-past-30-days-ii) | [Q1148](#q1148-article-views-i) | [Q1173](#q1173-immediate-food-delivery-i) | [Q1179](#q1179-reformat-department-table) | [Q1211](#q1211-queries-quality-and-percentage) | [Q1241](#q1241-number-of-comments-per-post) | [Q1251](#q1251-average-selling-price) | [Q1280](#q1280-students-and-examinations) | [Q1294](#q1294-weather-type-in-each-country) | [Q1303](#q1303-find-the-team-size) | [Q1322](#q1322-ads-performance) | [Q1327](#q1327-list-the-products-ordered-in-a-period) | [Q1350](#q1350-students-with-invalid-departments) | [Q1378](#q1378-replace-employee-id-with-the-unique-identifier) | [Q1407](#q1407-top-travellers) | [Q1435](#q1435-create-a-session-bar-chart) | [Q1484](#q1484-group-sold-products-by-the-date) | [Q1495](#q1495-friendly-movies-streamed-last-month)
 
+### Medium
+[Q177](#q177-nth-highest-salary) | [Q178](#q178-rank-scores) | [Q180](#q180-consecutive-numbers) | [Q184](#q184-department-highest-salary) | [Q534](#q534-game-play-analysis-iii) | [Q550](#q550-game-play-analysis-iv) | [Q570](#q570-managers-with-at-least-5-direct-reports) | [Q574](#q574-winning-candidate) | [Q578](#q578-get-highest-answer-rate-question) | [580](#q580-count-student-number-in-departments) | [Q585](#q585-investments-in-2016) | [Q602](#q602-friend-requests-ii-who-has-the-most-friends) | [Q608](#q608-tree-node) | [Q612](#q612-shortest-distance-in-a-plane) | [Q614](#q614-second-degree-follower) | [Q626](#q626-exchange-seats) | [Q1045](#q1045-customers-who-bought-all-products) | [Q1070](#q1070-product-sales-analysis-iii) | [Q1077](#q1077-project-employees-iii) | [Q1098](#q1098-unpopular-books) | [Q1107](#q1107-new-users-daily-count) | [Q1112](#q1112-highest-grade-for-each-student) | [Q1126](#q1126-active-businesses) | [Q1132](#q1132-reported-posts-ii) | [Q1149](#q1149-article-views-ii) | [Q1158](#q1158-market-analysis-i) | [Q1164](#q1164-product-price-at-a-given-date) | [Q1174](#q1174-immediate-food-delivery-ii) | [Q1193](#q1193-monthly-transactions-i) | [Q1204](#q1204-last-person-to-fit-in-the-elevator) | [Q1205](#q1205-monthly-transactions-ii) | [Q1212](#q1212-team-scores-in-football-tournament) | [Q1264](#q1264-page-recommendations) | [Q1270](#q1270-all-people-report-to-the-given-manager) | [Q1285](#q1285-find-the-start-and-end-number-of-continuous-ranges) | [Q1308](#q1308-running-total-for-different-genders) | [Q1321](#q1321-restaurant-growth) | [Q1341](#q1341-movie-rating) | [Q1355](#q1355-activity-participants) | [Q1364](#q1364-number-of-trusted-contacts-of-a-customer) | [Q1393](#q1393-capital-gainloss) | [Q1398](#q1398-customers-who-bought-products-a-and-b-but-not-c) | [Q1421](#q1421-npv-queries) | [Q1440](#q1440-evaluate-boolean-expression) | [Q1445](#q1445-apples-and-oranges) | [Q1454](#q1454-active-users) | [Q1459](#q1459-rectangles-area) | [Q1468](#q1468-calculate-salaries) | [Q1501](#q1501-countries-you-can-safely-invest-in) | [Q1532](#q1532-the-most-recent-three-orders)
+
+
+
+
 ## Solutions
 #### [**Q175 Combine Two Tables**][Q175]
 ```sql
@@ -1198,7 +1204,7 @@ ON T1.month = T2.month AND T1.country = T2.country
 [Q1193]:
 https://leetcode.com/problems/monthly-transactions-i/
 
-#### [**Q1204 Monthly Transactions I**][Q1204]
+#### [**Q1204 Last Person to Fit in the Elevator**][Q1204]
 ```sql
 SELECT person_name
 FROM
@@ -1260,7 +1266,7 @@ WHERE approved_count != 0 OR approved_amount != 0 OR chargeback_count != 0 OR ch
 [Q1205]:
 https://leetcode.com/problems/monthly-transactions-ii/
 
-#### [**Q1212 Monthly Transactions I**][Q1212]
+#### [**Q1212 Team Scores in Football Tournament**][Q1212]
 ```sql
 WITH Points (match_id,host_team, guest_team, host_points, guest_points ) AS(
     SELECT match_id ,host_team, guest_team, 
@@ -1553,7 +1559,7 @@ FROM New_form
 [Q1440]:
 https://leetcode.com/problems/evaluate-boolean-expression/
 
-#### [**Q1445 Apples & Oranges**][Q1445]
+#### [**Q1445 Apples and Oranges**][Q1445]
 ```sql
 SELECT Sales_dates.sale_date, apple_sold - orange_sold AS diff
 FROM
@@ -1644,7 +1650,7 @@ FROM rate
 [Q1468]:
 https://leetcode.com/problems/calculate-salaries/
 
-#### [**Q1501 Calculate Salaries**][Q1501]
+#### [**Q1501 Countries You Can Safely Invest In**][Q1501]
 ```sql
 # Solution 1
 WITH 
