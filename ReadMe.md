@@ -8,8 +8,8 @@ This file includes my solutions to LeetCode SQL questions in MySQL.
 ### Medium
 [Q177](#q177-nth-highest-salary) | [Q178](#q178-rank-scores) | [Q180](#q180-consecutive-numbers) | [Q184](#q184-department-highest-salary) | [Q534](#q534-game-play-analysis-iii) | [Q550](#q550-game-play-analysis-iv) | [Q570](#q570-managers-with-at-least-5-direct-reports) | [Q574](#q574-winning-candidate) | [Q578](#q578-get-highest-answer-rate-question) | [580](#q580-count-student-number-in-departments) | [Q585](#q585-investments-in-2016) | [Q602](#q602-friend-requests-ii-who-has-the-most-friends) | [Q608](#q608-tree-node) | [Q612](#q612-shortest-distance-in-a-plane) | [Q614](#q614-second-degree-follower) | [Q626](#q626-exchange-seats) | [Q1045](#q1045-customers-who-bought-all-products) | [Q1070](#q1070-product-sales-analysis-iii) | [Q1077](#q1077-project-employees-iii) | [Q1098](#q1098-unpopular-books) | [Q1107](#q1107-new-users-daily-count) | [Q1112](#q1112-highest-grade-for-each-student) | [Q1126](#q1126-active-businesses) | [Q1132](#q1132-reported-posts-ii) | [Q1149](#q1149-article-views-ii) | [Q1158](#q1158-market-analysis-i) | [Q1164](#q1164-product-price-at-a-given-date) | [Q1174](#q1174-immediate-food-delivery-ii) | [Q1193](#q1193-monthly-transactions-i) | [Q1204](#q1204-last-person-to-fit-in-the-elevator) | [Q1205](#q1205-monthly-transactions-ii) | [Q1212](#q1212-team-scores-in-football-tournament) | [Q1264](#q1264-page-recommendations) | [Q1270](#q1270-all-people-report-to-the-given-manager) | [Q1285](#q1285-find-the-start-and-end-number-of-continuous-ranges) | [Q1308](#q1308-running-total-for-different-genders) | [Q1321](#q1321-restaurant-growth) | [Q1341](#q1341-movie-rating) | [Q1355](#q1355-activity-participants) | [Q1364](#q1364-number-of-trusted-contacts-of-a-customer) | [Q1393](#q1393-capital-gainloss) | [Q1398](#q1398-customers-who-bought-products-a-and-b-but-not-c) | [Q1421](#q1421-npv-queries) | [Q1440](#q1440-evaluate-boolean-expression) | [Q1445](#q1445-apples-and-oranges) | [Q1454](#q1454-active-users) | [Q1459](#q1459-rectangles-area) | [Q1468](#q1468-calculate-salaries) | [Q1501](#q1501-countries-you-can-safely-invest-in) | [Q1532](#q1532-the-most-recent-three-orders)
 
-
-
+### Hard
+[Q185](#q185-department-top-three-salaries) | [Q262](#q262-trips-and-users) | [Q569](#q569-median-employee-salary) | [Q571](#q571-find-median-given-frequency-of-numbers) | [Q579](#q579-find-cumulative-salary-of-an-employee) | [Q601](#q601-human-traffic-of-stadium) | [Q615](#q615-average-salary-departments-vs-company) | [Q618](#q618-students-report-by-geography) | [Q1097](#q1097-game-play-analysis-v) | [Q1127](#q1127-user-purchase-platform) | [Q1159](#q1159-market-analysis-ii) | [Q1194](#q1194-tournament-winners) | [Q1225](#q1225-report-contiguous-dates) | [Q1336](#q1336-number-of-transactions-per-visit) | [Q1369](#q1369-get-the-second-most-recent-activity) | [Q1384](#q1384-total-sales-amount-by-year) | [Q1412](#q1412-find-the-quiet-students-in-all-exams) | [Q1479](#q1479-sales-by-day-of-the-week)
 
 ## Solutions
 #### [**Q175 Combine Two Tables**][Q175]
@@ -1722,3 +1722,623 @@ ORDER BY namE, T1.customer_id, order_date DESC
 ##### [**Back to Question List**](#question-list)
 [Q1532]:
 https://leetcode.com/problems/the-most-recent-three-orders/
+
+#### [**Q185 Department Top Three Salaries**][Q185]
+```sql
+SELECT Department.Name AS Department, T1.Name AS Employee, Salary
+FROM Department
+LEFT JOIN
+    (SELECT DepartmentId, Name, Salary, 
+     DENSE_RANK() OVER (PARTITION BY DepartmentId ORDER BY Salary DESC) AS department_rank
+     FROM Employee)T1 
+ON T1.DepartmentId = Department.id
+WHERE department_rank <=3
+```
+##### [**Back to Question List**](#question-list)
+[Q185]:
+https://leetcode.com/problems/department-top-three-salaries/
+
+#### [**Q262 Trips and Users**][Q262]
+```sql
+SELECT T2.Request_at AS Day, ROUND(COALESCE(cancelled/tot,0),2) AS "Cancellation Rate"
+FROM
+    (SELECT COUNT(Id) AS cancelled, Request_at
+     FROM Trips
+     WHERE Client_Id IN (SELECT Users_Id FROM Users WHERE Banned = "No")
+    AND   Driver_Id IN (SELECT Users_Id FROM Users WHERE Banned = "No")
+    AND Request_at BETWEEN DATE('2013-10-01') AND DATE('2013-10-03')
+    AND Status != ""completed""
+    GROUP BY Request_at)T1
+RIGHT JOIN
+    (SELECT COUNT(Id) AS tot, Request_at
+     FROM Trips
+     WHERE Client_Id IN (SELECT Users_Id FROM Users WHERE Banned = "No")
+     AND   Driver_Id IN (SELECT Users_Id FROM Users WHERE Banned = "No")
+     AND Request_at BETWEEN DATE('2013-10-01') AND DATE('2013-10-03')
+     GROUP BY Request_at)T2
+ON T1.Request_at = T2.Request_at
+```
+##### [**Back to Question List**](#question-list)
+[Q262]:
+https://leetcode.com/problems/trips-and-users/
+
+#### [**Q569 Median Employee Salary**][Q569]
+```sql
+SELECT Id, T1.Company, Salary
+FROM
+    (SELECT Id, Company, Salary,
+       RANK() OVER(PARTITION BY Company ORDER BY Salary) AS Salary_Rank
+     FROM Employee)T1
+LEFT JOIN
+    (SELECT Company, COUNT(Id)/2 AS Median_Rank
+     FROM Employee
+     GROUP BY Company)T2
+ON T1.Company = T2.Company
+WHERE Median_Rank = Salary_Rank OR Median_Rank + 1 = Salary_Rank
+
+UNION ALL
+
+SELECT MIN(T3.Id), T3.Company, Salary
+FROM
+    (SELECT Id, Company, Salary,
+     RANK() OVER(PARTITION BY Company ORDER BY Salary) AS Salary_Rank
+     FROM Employee)T3
+LEFT JOIN
+    (SELECT Company, COUNT(Id)/2+0.5 AS Median_Rank
+     FROM Employee
+     GROUP BY Company)T4
+ON T3.Company = T4.Company 
+WHERE T3.Salary_Rank = T4.Median_Rank 
+GROUP BY T3.Company, Salary
+```
+##### [**Back to Question List**](#question-list)
+[Q569]:
+https://leetcode.com/problems/median-employee-salary/
+
+#### [**Q571 Find Median Given Frequency of Numbers**][Q571]
+```sql
+WITH Total AS(    
+    SELECT Number,
+       SUM(Frequency) OVER(ORDER BY Number) - Frequency + 1 AS Start_Row,
+       SUM(Frequency) OVER(ORDER BY Number) AS End_Row,
+       SUM(Frequency) OVER(PARTITION BY NULL) AS Total_Numbers
+    FROM Numbers),
+    Median AS(
+    SELECT DISTINCT
+        CASE Total_Numbers%2 
+        WHEN 0 THEN Total_Numbers/2 
+            ELSE Total_Numbers/2+0.5 END AS Median_low,
+        CASE Total_Numbers%2
+        WHEN 0 THEN Total_Numbers/2+1 
+            ELSE Total_Numbers/2+0.5 END AS Median_high
+    FROM Total)
+    
+SELECT AVG(Number) AS median
+FROM
+(
+    SELECT Number, Start_Row, End_Row
+    FROM Total
+    WHERE Start_Row <= (SELECT Median_low FROM Median) 
+    AND End_Row >= (SELECT Median_low FROM Median)
+
+    UNION ALL
+
+    SELECT Number, Start_Row, End_Row
+    FROM Total
+    WHERE Start_Row <= (SELECT Median_high FROM Median) 
+    AND End_Row >= (SELECT Median_high FROM Median)
+) T1
+```
+##### [**Back to Question List**](#question-list)
+[Q571]:
+https://leetcode.com/problems/find-median-given-frequency-of-numbers/
+
+#### [**Q579 Find Cumulative Salary of an Employee**][Q579]
+```sql
+# Solution 1
+WITH T1 AS
+(SELECT Id, Month, Salary,
+        MAX(Month) OVER (PARTITION BY Id ORDER BY month DESC) AS most_rec_month
+ FROM Employee),
+ T2 AS
+ (SELECT Id, Month, 
+  Salary, COALESCE(LEAD(Salary,1) OVER (PARTITION BY id ORDER BY month DESC),0) AS Next_mon,
+  COALESCE(LEAD(Salary,2) OVER (PARTITION BY id ORDER BY month DESC),0) AS Next_2_mon
+  FROM T1 WHERE Month != most_rec_month)
+  
+SELECT id, Month, Salary + Next_mon + Next_2_mon AS Salary FROM T2
+```
+
+```sql
+# Solution 2
+"SELECT Id, Month, SUM(Salary) OVER(PARTITION BY Id ORDER BY Month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS Salary
+FROM
+    (SELECT Id, Month, Salary,
+            MAX(Month) OVER(PARTITION BY Id) AS recent_mon
+     FROM Employee) T1
+WHERE Month != recent_mon
+ORDER BY Id, Month DESC"
+```
+##### [**Back to Question List**](#question-list)
+[Q579]:
+https://leetcode.com/problems/find-cumulative-salary-of-an-employee/
+
+#### [**Q601 Human Traffic of Stadium**][Q601]
+```sql
+# Solution 1
+SELECT DISTINCT id, visit_date, people
+FROM stadium
+WHERE id IN 
+    (SELECT id
+     FROM(
+        SELECT id, visit_date, people, 
+               LEAD(people,1) OVER (ORDER BY id) AS next_people,
+               LEAD(people, 2) OVER (ORDER BY id) AS next_people_2
+        FROM stadium)T1
+     WHERE people >= 100 AND next_people >= 100 AND next_people_2 >= 100
+     
+     UNION
+     
+     SELECT id+1
+     FROM(
+        SELECT id, visit_date, people, 
+               LEAD(people,1) OVER (ORDER BY id) AS next_people,
+               LEAD(people, 2) OVER (ORDER BY id) AS next_people_2
+        FROM stadium)T1
+     WHERE people >= 100 AND next_people >= 100 AND next_people_2 >= 100
+     
+     UNION
+     
+     SELECT id+2
+     FROM(
+        SELECT id, visit_date, people, 
+               LEAD(people,1) OVER (ORDER BY id) AS next_people,
+               LEAD(people, 2) OVER (ORDER BY id) AS next_people_2
+        FROM stadium)T1
+     WHERE people >= 100 AND next_people >= 100 AND next_people_2 >= 100)
+```
+
+```sql
+# Solutio 2
+WITH visit_date AS(
+SELECT visit_date, last_date, next_date
+FROM
+    (SELECT visit_date, people,
+       LEAD(people,1) OVER (ORDER BY visit_date) AS next_people,
+       LAG(people, 1) OVER (ORDER BY visit_date) AS last_people,
+       LEAD(visit_date,1) OVER (ORDER BY visit_date) AS next_date,
+       LAG(visit_date, 1) OVER (ORDER BY visit_date) AS last_date
+     FROM stadium)T1
+WHERE people >= 100 AND next_people >= 100 AND last_people >= 100)
+
+SELECT id, visit_date, people 
+FROM
+    (SELECT id, visit_date, people
+     FROM stadium
+     WHERE visit_date IN (SELECT visit_date FROM visit_date)
+     UNION
+     SELECT id, visit_date, people
+     FROM stadium
+     WHERE visit_date IN (SELECT next_date FROM visit_date)
+     UNION
+     SELECT id, visit_date, people
+     FROM stadium
+     WHERE visit_date IN (SELECT last_date FROM visit_date))T2
+ORDER BY id
+```
+##### [**Back to Question List**](#question-list)
+[Q601]:
+https://leetcode.com/problems/human-traffic-of-stadium/
+
+#### [**Q615 Average Salary: Departments VS Company**][Q615]
+```sql
+WITH tot_salary AS(
+SELECT id, department_id, amount, LEFT(pay_date, 7) AS pay_month
+FROM salary LEFT JOIN employee
+ON salary.employee_id = employee.employee_id)
+
+SELECT pay_month, department_id, CASE 
+WHEN department_mth_avg > company_mth_avg THEN 'higher'
+WHEN department_mth_avg = company_mth_avg THEN 'same'
+WHEN department_mth_avg < company_mth_avg THEN 'lower' END AS comparison
+FROM
+    (SELECT DISTINCT pay_month, department_id, 
+     AVG(amount) OVER(PARTITION BY department_id, pay_month) AS department_mth_avg,
+     AVG(amount) OVER(PARTITION BY pay_month) AS company_mth_avg
+    FROM tot_salary)T1
+```
+##### [**Back to Question List**](#question-list)
+[Q615]:
+https://leetcode.com/problems/average-salary-departments-vs-company/
+
+#### [**Q618 Students Report By Geography**][Q618]
+```sql
+# Solution 1
+WITH 
+America AS(
+SELECT name, ROW_NUMBER() OVER (PARTITION BY NULL ORDER BY Name) AS row_num
+FROM student
+WHERE continent = 'America'),
+Europe AS(
+SELECT name, ROW_NUMBER() OVER (PARTITION BY NULL ORDER BY Name) AS row_num
+FROM student
+WHERE continent = 'Europe'),
+Asia AS(
+SELECT name, ROW_NUMBER() OVER (PARTITION BY NULL ORDER BY Name) AS row_num
+FROM student
+WHERE continent = 'Asia')
+
+
+SELECT America.name AS America, Asia.name AS Asia, Europe.name AS Europe
+FROM America 
+LEFT JOIN Asia
+ON America.row_num = ASIA.row_num
+LEFT JOIN Europe 
+ON America.row_num = Europe.row_num
+```
+
+```sql
+# Solution 2
+SELECT
+        MAX(CASE WHEN continent = 'America' THEN name END )AS America,
+        MAX(CASE WHEN continent = 'Asia' THEN name END )AS Asia,
+        MAX(CASE WHEN continent = 'Europe' THEN name END )AS Europe  
+FROM (SELECT *, ROW_NUMBER()OVER(PARTITION BY continent ORDER BY name) AS row_id FROM student) AS t
+GROUP BY row_id
+```
+##### [**Back to Question List**](#question-list)
+[Q618]:
+https://leetcode.com/problems/students-report-by-geography/
+
+#### [**Q1097 Game Play Analysis V**][Q1097]
+```sql
+WITH installment AS(
+    SELECT player_id, event_date,
+           MIN(event_date) OVER (PARTITION BY player_id) AS install_dt,
+           DATE_ADD(MIN(event_date) OVER (PARTITION BY player_id), INTERVAL 1 DAY) AS next_day
+    FROM Activity)
+    
+    
+SELECT install_dt, SUM(install_cnt) AS installs, ROUND(SUM(next_cnt) / SUM(install_cnt), 2) AS Day1_retention   
+FROM
+   (SELECT install_dt, 
+       CASE event_date WHEN install_dt THEN 1 ELSE 0 END AS install_cnt,
+       CASE event_date WHEN next_day THEN 1 ELSE 0 END AS next_cnt
+    FROM installment)T1
+GROUP BY install_dt
+ORDER BY install_dt
+```
+##### [**Back to Question List**](#question-list)
+[Q1097]:
+https://leetcode.com/problems/game-play-analysis-v/
+
+#### [**Q1127 User Purchase Platform**][Q1127]
+```sql
+WITH platform AS (
+SELECT DISTINCT spend_date, 'mobile' AS platform FROM Spending
+UNION ALL
+SELECT DISTINCT spend_date, 'desktop' AS platform FROM Spending
+UNION ALL
+SELECT DISTINCT spend_date, 'both' AS platform FROM Spending),
+
+spending_2 AS(
+SELECT user_id, spend_date, platform, amount,
+    COUNT(platform) OVER(PARTITION BY user_id, spend_date) AS platform_cnt
+FROM spending)
+
+
+SELECT platform.spend_date AS spend_date, platform.platform AS platform, COALESCE(total_amount,0)AS total_amount, COALESCE(total_users,0) AS total_users
+FROM platform LEFT JOIN
+   (SELECT spend_date, new_platform AS platform, SUM(amount) AS total_amount,
+            COALESCE(COUNT(DISTINCT user_id),0) AS total_users
+    FROM
+        (SELECT spend_date, amount, user_id,
+         CASE platform_cnt 
+         WHEN 1 THEN platform ELSE 'both' END AS new_platform
+         FROM spending_2)T1
+    GROUP BY spend_date, new_platform)T2
+ON platform.spend_date = T2.spend_date AND platform.platform = T2.platform
+```
+##### [**Back to Question List**](#question-list)
+[Q1127]:
+https://leetcode.com/problems/user-purchase-platform/
+
+#### [**Q1159 Market Analysis II**][Q1159]
+```sql
+WITH seller AS(
+    SELECT seller_id, order_date, item_brand
+    FROM Orders LEFT JOIN Users
+    ON Orders.seller_id = Users.user_id
+    LEFT JOIN Items
+    ON Orders.item_id = Items.item_id
+    ORDER BY seller_id, order_date),
+    
+    num_item AS(
+    SELECT seller_id, ROW_NUMBER() OVER (PARTITION BY seller_id ORDER BY order_date) AS num_item_sold, item_brand
+    FROM seller)
+
+
+SELECT user_id AS seller_id, 
+CASE Users.favorite_brand WHEN item_brand THEN 'yes' 
+ELSE 'no' END AS 2nd_item_fav_brand   
+FROM Users
+LEFT JOIN 
+    (SELECT seller_id, item_brand
+     FROM num_item
+     WHERE num_item_sold = 2)T1
+ON Users.user_id = T1.seller_id
+```
+##### [**Back to Question List**](#question-list)
+[Q1159]:
+https://leetcode.com/problems/market-analysis-ii/
+
+#### [**Q1194 Tournament Winners**][Q1194]
+```sql
+WITH score AS
+(SELECT group_id, player_id, tot_score, MAX(tot_score) OVER(PARTITION  BY group_id) AS group_max_score
+ FROM Players LEFT JOIN
+   (SELECT player, SUM(score) AS tot_score
+    FROM
+        (SELECT first_player AS player, SUM(first_score) AS score
+         FROM Matches
+         GROUP BY first_player
+
+         UNION ALL
+
+         SELECT second_player, SUM(second_score)
+         FROM Matches
+         GROUP BY second_player)T1
+    GROUP BY player)T2
+ ON Players.player_id = T2.player)
+
+SELECT group_id, player_id
+FROM
+   (SELECT group_id, player_id, ROW_NUMBER() OVER(PARTITION BY group_id ORDER BY player_id) AS small_id
+    FROM score
+    WHERE tot_score = group_max_score)T3
+WHERE small_id = 1
+```
+##### [**Back to Question List**](#question-list)
+[Q1194]:
+https://leetcode.com/problems/tournament-winners/
+
+#### [**Q1225 Report Contiguous Dates**][Q1225]
+```sql
+WITH period_state AS(
+    SELECT fail_date AS date, ""failed"" AS period_state, 
+           DATEDIFF(fail_date, LAG(fail_date,1) OVER (ORDER BY fail_date)) AS days_to_last, 
+           DATEDIFF(LEAD(fail_date,1) OVER(ORDER BY fail_date), fail_date) AS days_to_next
+    FROM Failed
+    WHERE fail_date >= DATE('2019-01-01') AND fail_date <= DATE('2019-12-31')
+    UNION ALL
+    SELECT success_date AS date, ""succeeded"" AS period_state, 
+           DATEDIFF(success_date, LAG(success_date,1) OVER (ORDER BY success_date)) AS days_to_last, 
+           DATEDIFF(LEAD(success_date,1) OVER(ORDER BY success_date), success_date) AS days_to_next
+    FROM Succeeded
+    WHERE success_date >= DATE('2019-01-01') AND success_date <= DATE('2019-12-31'))
+
+
+SELECT period_state, start_date, end_date
+FROM(
+    
+SELECT period_state, start_date, end_date
+FROM
+    (
+    SELECT period_state, date, start_date, ROW_NUMBER() OVER(ORDER BY date) AS row_num
+     FROM
+        (SELECT date, period_state, days_to_last, days_to_next,
+         CASE WHEN days_to_last != 1 OR days_to_last IS NULL 
+         THEN date ELSE 'NOT A START DATE' END AS start_date
+         FROM period_state WHERE period_state = 'failed')T1
+     WHERE start_date != 'NOT A START DATE')T2
+    LEFT JOIN
+    (SELECT date, end_date, ROW_NUMBER() OVER(ORDER BY date) AS row_num
+     FROM
+        (SELECT date, period_state, days_to_last, days_to_next,
+                CASE WHEN days_to_next != 1 OR days_to_next IS NULL 
+                THEN date ELSE 'NOT A END DATE' END AS end_date
+         FROM period_state WHERE period_state = 'failed')T3
+     WHERE end_date != 'NOT A END DATE' )T4
+     ON T2.row_num = T4.row_num
+
+UNION ALL
+
+SELECT T6.period_state, start_date, end_date
+FROM
+    (SELECT period_state, date, start_date, ROW_NUMBER() OVER(ORDER BY date) AS row_num
+     FROM
+        (SELECT date, period_state, days_to_last, days_to_next,
+                CASE WHEN days_to_last != 1 OR days_to_last IS NULL 
+                THEN date ELSE 'NOT A START DATE' END AS start_date
+         FROM period_state WHERE period_state = 'succeeded')T5
+     WHERE start_date != 'NOT A START DATE')T6
+    LEFT JOIN
+    (SELECT date, end_date, ROW_NUMBER() OVER(ORDER BY date) AS row_num
+     FROM
+        (SELECT date, period_state, days_to_last, days_to_next, 
+                CASE WHEN days_to_next != 1 OR days_to_next IS NULL 
+                THEN date ELSE 'NOT A END DATE' END AS end_date
+         FROM period_state WHERE period_state = 'succeeded')T7
+     WHERE end_date != 'NOT A END DATE')T8
+     ON T6.row_num = T8.row_num)T9
+ORDER BY start_date
+```
+##### [**Back to Question List**](#question-list)
+[Q1225]:
+https://leetcode.com/problems/report-contiguous-dates/
+
+#### [**Q1336 Number of Transactions per Visit**][Q1336]
+```sql
+WITH T1 AS
+    (SELECT user_id, transaction_date, COUNT(user_id) AS tran_user_day
+     FROM Transactions
+     GROUP BY user_id, transaction_date
+     ORDER BY user_id, transaction_date),
+     T2 AS
+     (SELECT tran_cnt
+      FROM
+        (SELECT ROW_NUMBER() OVER(PARTITION BY NULL) -1 AS tran_cnt 
+         FROM Transactions UNION
+         SELECT ROW_NUMBER() OVER(PARTITION BY NULL)
+         FROM Transactions)T3
+      WHERE tran_cnt <= (SELECT MAX(tran_user_day) FROM T1)
+      UNION SELECT 0)
+
+SELECT T2.tran_cnt AS transactions_count, COALESCE(visits,0) AS visits_count
+FROM T2 LEFT JOIN
+   (SELECT COALESCE(tran_user_day,0) AS trans_cnt, COUNT(Visits.user_id) AS visits
+    FROM Visits LEFT JOIN T1 
+    ON Visits.user_id = T1.user_id AND Visits.visit_date = T1.transaction_date
+    GROUP BY COALESCE(tran_user_day,0))T3
+ON T2.tran_cnt = T3.trans_cnt
+```
+##### [**Back to Question List**](#question-list)
+[Q1336]:
+https://leetcode.com/problems/number-of-transactions-per-visit/
+
+#### [**Q1369 Get the Second Most Recent Activity**][Q1369]
+```sql
+WITH Activity AS(
+SELECT username, activity, startDate, endDate, 
+       COUNT(activity) OVER(PARTITION BY username) AS act_cnt,
+       ROW_NUMBER() OVER(PARTITION BY username ORDER BY startDate DESC) AS act_rank
+FROM UserActivity)
+
+SELECT username, activity, startDate, endDate
+FROM Activity WHERE act_cnt = 1
+UNION
+SELECT username, activity, startDate, endDate
+FROM Activity WHERE act_rank = 2
+```
+##### [**Back to Question List**](#question-list)
+[Q1369]:
+https://leetcode.com/problems/get-the-second-most-recent-activity/
+
+#### [**Q1384 Total Sales Amount by Year**][Q1384]
+```sql
+WITH ann_sales AS(
+    SELECT product_id, average_daily_sales, period_start, period_end, 
+       LEFT(period_end,4) - LEFT(period_start, 4) AS yr_diff
+    FROM Sales),
+    
+    sales_by_yr AS(
+    SELECT product_id, average_daily_sales, LEFT(period_start, 4) AS report_year,
+           DATEDIFF(period_end, period_start)+1 AS sales_days
+    FROM ann_sales WHERE yr_diff = 0
+
+    UNION ALL
+
+    SELECT product_id, average_daily_sales, LEFT(period_start, 4) AS report_year,
+           DATEDIFF(DATE(""2018-12-31""), period_start)+1 AS sales_days
+    FROM ann_sales WHERE yr_diff = 1 AND period_start <= DATE('2018-12-31')
+
+    UNION ALL
+
+    SELECT product_id, average_daily_sales, LEFT(period_end, 4) AS report_year, 
+           DATEDIFF(period_end, DATE(""2019-01-01""))+1 AS sales_days
+    FROM ann_sales WHERE yr_diff = 1 AND period_start <= DATE('2018-12-31')
+
+    UNION ALL
+
+    SELECT product_id, average_daily_sales, LEFT(period_start, 4) AS report_year, 
+           DATEDIFF(DATE(""2019-12-31""), period_start)+1 AS sales_days
+    FROM ann_sales 
+    WHERE yr_diff = 1 
+    AND period_start <= DATE('2019-12-31')
+    AND period_start >= DATE('2019-01-01')
+
+    UNION ALL
+
+    SELECT product_id, average_daily_sales, LEFT(period_end, 4) AS report_year, 
+           DATEDIFF(period_end, DATE(""2020-01-01""))+1 AS sales_days
+    FROM ann_sales 
+    WHERE yr_diff = 1 
+    AND period_start <= DATE('2019-12-31')
+    AND period_start >= DATE('2019-01-01')
+
+    UNION ALL
+
+    SELECT product_id, average_daily_sales, LEFT(period_start, 4) AS report_year, 
+           DATEDIFF(DATE(""2018-12-31""), period_start)+1 AS sales_days
+    FROM ann_sales 
+    WHERE yr_diff = 2
+    
+
+    UNION ALL
+
+    SELECT product_id, average_daily_sales, 2019 AS report_year, 
+           DATEDIFF(DATE(""2019-12-31""), DATE('2019-01-01'))+1 AS sales_days
+    FROM ann_sales 
+    WHERE yr_diff = 2
+
+    UNION ALL
+
+    SELECT product_id, average_daily_sales, LEFT(period_end, 4) AS report_year, 
+           DATEDIFF(period_end, DATE(""2020-01-01""))+1 AS sales_days
+    FROM ann_sales 
+    WHERE yr_diff = 2)
+    
+SELECT sales_by_yr.product_id, MIN(product_name) AS product_name, report_year, 
+       SUM(average_daily_sales * sales_days) AS total_amount
+FROM sales_by_yr LEFT JOIN Product
+ON sales_by_yr.product_id = Product.product_id
+GROUP BY sales_by_yr.product_id, report_year
+ORDER BY product_id, report_year
+```
+##### [**Back to Question List**](#question-list)
+[Q1384]:
+https://leetcode.com/problems/total-sales-amount-by-year/
+
+#### [**Q1412 Find the Quiet Students in All Exams**][Q1412]
+```sql
+WITH score AS(
+SELECT exam_id, student_id, score, 
+       MIN(score) OVER(PARTITION BY exam_id) AS lowest_exam,
+       MAX(score) OVER(PARTITION BY exam_id) AS highest_exam
+FROM Exam)
+
+SELECT DISTINCT score.student_id, student_name
+FROM score LEFT JOIN Student
+ON score.student_id = Student.student_id
+WHERE score.student_id NOT IN (SELECT DISTINCT student_id FROM score WHERE score = lowest_exam OR score = highest_exam)
+```
+##### [**Back to Question List**](#question-list)
+[Q1412]:
+https://leetcode.com/problems/find-the-quiet-students-in-all-exams/
+
+#### [**Q1479 Sales by Day of the Week**][Q1479]
+```sql
+WITH     
+    pivot AS(
+    SELECT item_id, 
+           CASE DAYOFWEEK(order_date) WHEN 2 THEN quantity ELSE 0 END Monday,
+           CASE DAYOFWEEK(order_date) WHEN 3 THEN quantity ELSE 0 END Tuesday,
+           CASE DAYOFWEEK(order_date) WHEN 4 THEN quantity ELSE 0 END Wednesday,
+           CASE DAYOFWEEK(order_date) WHEN 5 THEN quantity ELSE 0 END Thursday,
+           CASE DAYOFWEEK(order_date) WHEN 6 THEN quantity ELSE 0 END Friday,
+           CASE DAYOFWEEK(order_date) WHEN 7 THEN quantity ELSE 0 END Saturday,
+           CASE DAYOFWEEK(order_date) WHEN 1 THEN quantity ELSE 0 END Sunday
+    FROM Orders)
+ 
+
+SELECT item_Category AS category, COALESCE(SUM(Monday),0) AS Monday,
+                    COALESCE(SUM(Tuesday),0) AS Tuesday,
+                    COALESCE(SUM(Wednesday),0) AS Wednesday,
+                    COALESCE(SUM(Thursday),0) AS Thursday,
+                    COALESCE(SUM(Friday),0) AS Friday,
+                    COALESCE(SUM(Saturday),0) AS Saturday,
+                    COALESCE(SUM(Sunday),0) AS Sunday
+FROM Items
+LEFT JOIN  
+    (SELECT item_id, SUM(Monday) AS Monday, SUM(Tuesday) AS Tuesday, SUM(Wednesday) AS Wednesday,
+            SUM(Thursday) AS Thursday, SUM(Friday) AS Friday, SUM(Saturday) AS Saturday,
+            SUM(Sunday) AS Sunday
+     FROM pivot
+     GROUP BY item_id)T2
+ON  Items.item_id = T2.item_id
+GROUP BY item_Category
+ORDER BY item_Category
+```
+##### [**Back to Question List**](#question-list)
+[Q1479]:
+https://leetcode.com/problems/sales-by-day-of-the-week/
