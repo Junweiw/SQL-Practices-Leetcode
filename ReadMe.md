@@ -583,7 +583,7 @@ https://leetcode.com/problems/find-the-team-size/
 ```sql
 SELECT ad_id, ROUND(COALESCE(Clicks/(Views+Clicks)*100,0), 2) AS ctr
 FROM
-    (SELECT ad_id, SUM(CASE action WHEN "Clicked" THEN 1 ELSE 0 END) AS Clicks, 
+    (SELECT ad_id, SUM(CASE action WHEN "Clicked" THEN 1 ELSE 0 END) AS "Clicks", 
                    SUM(CASE action WHEN "Viewed" THEN 1 ELSE 0 END) AS "Views"
      FROM Ads
      GROUP BY ad_id) T1
