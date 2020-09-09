@@ -2254,7 +2254,7 @@ WITH ann_sales AS(
     UNION ALL
 
     SELECT product_id, average_daily_sales, LEFT(period_end, 4) AS report_year, 
-           DATEDIFF(period_end, DATE(""2020-01-01""))+1 AS sales_days
+           DATEDIFF(period_end, DATE("2020-01-01"))+1 AS sales_days
     FROM ann_sales 
     WHERE yr_diff = 1 
     AND period_start <= DATE('2019-12-31')
