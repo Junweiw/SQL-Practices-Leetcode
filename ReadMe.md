@@ -229,7 +229,7 @@ WHERE salesperson.sales_id
             FROM orders
             LEFT JOIN company
             ON orders.com_id = company.com_id
-            WHERE company.name = ""RED"")
+            WHERE company.name = "RED")
 ```
 ##### [**Back to Question List**](#question-list)
 [Q607]:
@@ -583,8 +583,8 @@ https://leetcode.com/problems/find-the-team-size/
 ```sql
 SELECT ad_id, ROUND(COALESCE(Clicks/(Views+Clicks)*100,0), 2) AS ctr
 FROM
-    (SELECT ad_id, SUM(CASE action WHEN ""Clicked"" THEN 1 ELSE 0 END) AS Clicks, 
-                   SUM(CASE action WHEN ""Viewed"" THEN 1 ELSE 0 END) AS ""Views""
+    (SELECT ad_id, SUM(CASE action WHEN "Clicked" THEN 1 ELSE 0 END) AS Clicks, 
+                   SUM(CASE action WHEN "Viewed" THEN 1 ELSE 0 END) AS "Views"
      FROM Ads
      GROUP BY ad_id) T1
 ORDER BY ctr DESC, ad_id
@@ -598,7 +598,7 @@ https://leetcode.com/problems/ads-performance/
 SELECT product_name, unit
 FROM (SELECT product_id, SUM(unit) AS unit
       FROM Orders
-      WHERE order_date BETWEEN DATE(""2020-02-01"") AND DATE(""2020-02-29"")
+      WHERE order_date BETWEEN DATE("2020-02-01") AND DATE("2020-02-29")
       GROUP BY product_id) T1
 LEFT JOIN Products
 ON T1.product_id = Products.product_id
@@ -658,10 +658,10 @@ FROM
      SELECT '15 or more' AS bin)T1
     LEFT JOIN
     (SELECT COUNT(session_id) AS total,
-      CASE WHEN duration/60 >= 0 AND duration/60 < 5 THEN ""[0-5>""
-            WHEN duration/60 >= 5 AND duration/60 < 10 THEN ""[5-10>""
-            WHEN duration/60 >= 10 AND duration/60 < 15 THEN ""[10-15>""
-            ELSE ""15 or more""
+      CASE WHEN duration/60 >= 0 AND duration/60 < 5 THEN "[0-5>"
+            WHEN duration/60 >= 5 AND duration/60 < 10 THEN "[5-10>"
+            WHEN duration/60 >= 10 AND duration/60 < 15 THEN "[10-15>"
+            ELSE "15 or more"
       END AS bin
      FROM Sessions
      GROUP BY bin)T2
@@ -781,7 +781,7 @@ SELECT ROUND(COUNT(DISTINCT T2.player_id)/ COUNT( DISTINCT activity.player_id),2
 FROM
     (SELECT T1.player_id, (event_date - first_login) AS day_diff
         FROM
-        (SELECT player_id, event_date ,MIN(event_date) OVER (PARTITION BY player_id)    as first_login FROM activity) T1)T2, activity
+        (SELECT player_id, event_date ,MIN(event_date) OVER (PARTITION BY player_id) as first_login FROM activity) T1)T2, activity
 WHERE T2.day_diff = 1
 ```
 ##### [**Back to Question List**](#question-list)
@@ -889,15 +889,15 @@ https://leetcode.com/problems/friend-requests-ii-who-has-the-most-friends/
 
 #### [**Q608 Tree Node**][Q608]
 ```sql
-SELECT DISTINCT id AS Id, ""Root"" AS Type
+SELECT DISTINCT id AS Id, "Root" AS Type
 FROM tree
 WHERE p_id IS NULL
 UNION ALL
-SELECT DISTINCT id AS Id, ""Inner"" AS Type
+SELECT DISTINCT id AS Id, "Inner" AS Type
 FROM tree
 WHERE id IN (SELECT DISTINCT p_id FROM tree) AND p_id IS NOT NULL
 UNION ALL
-SELECT DISTINCT id AS Id, ""Leaf"" AS Type
+SELECT DISTINCT id AS Id, "Leaf" AS Type
 FROM tree
 WHERE id NOT IN (SELECT DISTINCT p_id FROM tree WHERE p_id IS NOT NULL) AND p_id IS NOT NULL
 ```
@@ -2233,19 +2233,19 @@ WITH ann_sales AS(
     UNION ALL
 
     SELECT product_id, average_daily_sales, LEFT(period_start, 4) AS report_year,
-           DATEDIFF(DATE(""2018-12-31""), period_start)+1 AS sales_days
+           DATEDIFF(DATE("2018-12-31"), period_start)+1 AS sales_days
     FROM ann_sales WHERE yr_diff = 1 AND period_start <= DATE('2018-12-31')
 
     UNION ALL
 
     SELECT product_id, average_daily_sales, LEFT(period_end, 4) AS report_year, 
-           DATEDIFF(period_end, DATE(""2019-01-01""))+1 AS sales_days
+           DATEDIFF(period_end, DATE("2019-01-01"))+1 AS sales_days
     FROM ann_sales WHERE yr_diff = 1 AND period_start <= DATE('2018-12-31')
 
     UNION ALL
 
     SELECT product_id, average_daily_sales, LEFT(period_start, 4) AS report_year, 
-           DATEDIFF(DATE(""2019-12-31""), period_start)+1 AS sales_days
+           DATEDIFF(DATE("2019-12-31"), period_start)+1 AS sales_days
     FROM ann_sales 
     WHERE yr_diff = 1 
     AND period_start <= DATE('2019-12-31')
@@ -2263,7 +2263,7 @@ WITH ann_sales AS(
     UNION ALL
 
     SELECT product_id, average_daily_sales, LEFT(period_start, 4) AS report_year, 
-           DATEDIFF(DATE(""2018-12-31""), period_start)+1 AS sales_days
+           DATEDIFF(DATE("2018-12-31"), period_start)+1 AS sales_days
     FROM ann_sales 
     WHERE yr_diff = 2
     
@@ -2271,14 +2271,14 @@ WITH ann_sales AS(
     UNION ALL
 
     SELECT product_id, average_daily_sales, 2019 AS report_year, 
-           DATEDIFF(DATE(""2019-12-31""), DATE('2019-01-01'))+1 AS sales_days
+           DATEDIFF(DATE("2019-12-31"), DATE('2019-01-01'))+1 AS sales_days
     FROM ann_sales 
     WHERE yr_diff = 2
 
     UNION ALL
 
     SELECT product_id, average_daily_sales, LEFT(period_end, 4) AS report_year, 
-           DATEDIFF(period_end, DATE(""2020-01-01""))+1 AS sales_days
+           DATEDIFF(period_end, DATE("2020-01-01"))+1 AS sales_days
     FROM ann_sales 
     WHERE yr_diff = 2)
     
