@@ -1188,7 +1188,7 @@ https://leetcode.com/problems/immediate-food-delivery-ii/
 ```sql
 WITH Transaction_table (id, country, approved, amount, month) 
     AS( SELECT id, country, 
-               CASE state WHEN ""approved"" THEN 1 ELSE 0 END AS approved,
+               CASE state WHEN "approved" THEN 1 ELSE 0 END AS approved,
                amount, DATE_FORMAT(trans_date, '%Y-%m') AS month
         FROM Transactions)
       
@@ -1486,8 +1486,8 @@ SELECT stock_name, SUM(gain) AS capital_gain_loss
 FROM
     (SELECT stock_name, operation, operation_day, 
        CASE operation 
-       WHEN ""Buy"" THEN price*-1 
-       WHEN ""Sell"" THEN price END AS gain
+       WHEN "Buy" THEN price*-1 
+       WHEN "Sell" THEN price END AS gain
      FROM Stocks)T1
 GROUP BY stock_name
 ```
@@ -1659,7 +1659,7 @@ https://leetcode.com/problems/calculate-salaries/
 # Solution 1
 WITH 
 Persons AS
-(SELECT SUBSTRING_INDEX(phone_number,""-"",1) AS country_code, id, name, phone_number FROM Person), 
+(SELECT SUBSTRING_INDEX(phone_number,"-",1) AS country_code, id, name, phone_number FROM Person), 
 
 Person_country AS 
 (SELECT id, Persons.name, phone_number, Country.name AS country
@@ -1751,7 +1751,7 @@ FROM
      WHERE Client_Id IN (SELECT Users_Id FROM Users WHERE Banned = "No")
     AND   Driver_Id IN (SELECT Users_Id FROM Users WHERE Banned = "No")
     AND Request_at BETWEEN DATE('2013-10-01') AND DATE('2013-10-03')
-    AND Status != ""completed""
+    AND Status != "completed"
     GROUP BY Request_at)T1
 RIGHT JOIN
     (SELECT COUNT(Id) AS tot, Request_at
@@ -2109,13 +2109,13 @@ https://leetcode.com/problems/tournament-winners/
 #### [**Q1225 Report Contiguous Dates**][Q1225]
 ```sql
 WITH period_state AS(
-    SELECT fail_date AS date, ""failed"" AS period_state, 
+    SELECT fail_date AS date, "failed" AS period_state, 
            DATEDIFF(fail_date, LAG(fail_date,1) OVER (ORDER BY fail_date)) AS days_to_last, 
            DATEDIFF(LEAD(fail_date,1) OVER(ORDER BY fail_date), fail_date) AS days_to_next
     FROM Failed
     WHERE fail_date >= DATE('2019-01-01') AND fail_date <= DATE('2019-12-31')
     UNION ALL
-    SELECT success_date AS date, ""succeeded"" AS period_state, 
+    SELECT success_date AS date, "succeeded" AS period_state, 
            DATEDIFF(success_date, LAG(success_date,1) OVER (ORDER BY success_date)) AS days_to_last, 
            DATEDIFF(LEAD(success_date,1) OVER(ORDER BY success_date), success_date) AS days_to_next
     FROM Succeeded
