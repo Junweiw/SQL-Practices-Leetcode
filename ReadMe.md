@@ -1,4 +1,4 @@
-# SQL Practices
+# SQL Practices On LeetCode
 This file includes my solutions to LeetCode SQL questions in MySQL.
 
 ## Question List
